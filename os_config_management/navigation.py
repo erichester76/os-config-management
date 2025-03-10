@@ -1,6 +1,6 @@
-from netbox.plugins import PluginMenuItem
+from netbox.plugins import PluginMenu, PluginMenuItem, PluginMenuButton
 
-menu_items = (
+items = (
     PluginMenuItem(
         link='plugins:netbox_os_config:configitem_list',
         link_text='Config Items',
@@ -16,4 +16,10 @@ menu_items = (
         link_text='OS Configurations',
         permissions=['netbox_os_config.view_osconfig']
     ),
+)
+
+menu = PluginMenu(
+    label='OS Configuration Management',
+    icon_class='mdi mdi-harddisk',
+    groups=(('OS Configuration', items),)
 )
