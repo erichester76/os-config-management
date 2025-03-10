@@ -55,7 +55,7 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form_class = ConfigSetForm
+    form = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
