@@ -1,0 +1,90 @@
+<!-- templates/os_config_management/configset_edit.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Edit ConfigSet: {{ configset.name }}</h2>
+  <form method="post" id="configset-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <h3>Config Items</h3>
+    {{ formset.management_form }}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Config Item</th>
+          <th>Value</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="formset-rows">
+        {% for form in formset %}
+          <tr class="formset-row">
+            <td>{{ form.config_item }}</td>
+            <td>{{ form.value }}</td>
+            <td>{{ form.DELETE }} <button type="button" class="btn btn-danger delete-row">Delete</button></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" id="add-row" class="btn btn-primary">Add Row</button>
+    <button type="submit" class="btn btn-success">Save</button>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const formsetRows = document.getElementById('formset-rows');
+      const addRowButton = document.getElementById('add-row');
+      const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+
+      // Add new row
+      addRowButton.addEventListener('click', function() {
+        const rowCount = formsetRows.children.length;
+        const newRow = formsetRows.children[0].cloneNode(true);
+        newRow.querySelectorAll('input, select').forEach(input => {
+          input.name = input.name.replace(/-\d+-/, `-${rowCount}-`);
+          input.id = input.id.replace(/-\d+-/, `-${rowCount}-`);
+          if (input.type !== 'checkbox') input.value = '';
+          if (input.type === 'checkbox') input.checked = false;
+        });
+        formsetRows.appendChild(newRow);
+        totalForms.value = parseInt(totalForms.value) + 1;
+      });
+
+      // Delete row
+      formsetRows.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-row')) {
+          const row = e.target.closest('.formset-row');
+          const deleteCheckbox = row.querySelector('input[type="checkbox"]');
+          if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            row.style.display = 'none';
+          } else if (formsetRows.children.length > 1) {
+            row.remove();
+            totalForms.value = parseInt(totalForms.value) - 1;
+          }
+        }
+      });
+
+      // Dynamic value field update
+      formsetRows.addEventListener('change', function(e) {
+        if (e.target.classList.contains('config-item-select')) {
+          const row = e.target.closest('.formset-row');
+          const configItemId = e.target.value;
+          fetch(`/api/plugins/os-config-management/configitems/${configItemId}/`)
+            .then(response => response.json())
+            .then(data => {
+              const valueField = row.querySelector('.config-value');
+              if (data.type === 'boolean') {
+                valueField.outerHTML = `<input type="checkbox" name="${valueField.name}" class="form-check-input config-value">`;
+              } else if (data.type === 'list') {
+                valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value" placeholder="Comma-separated list">`;
+              } else {
+                valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value">`;
+              }
+            });
+        }
+      });
+    });
+  </script>
+{% endblock %}
