@@ -12,9 +12,7 @@ class ConfigItemForm(NetBoxModelForm):
         fields = ('name', 'type', 'description', 'required', 'tags')
 
 class ConfigItemFilterForm(NetBoxModelFilterSetForm):
-     class Meta:
-        model = ConfigItem
-        fields = ['name', 'description']    
+    model = ConfigItem
         
 class ConfigSetForm(NetBoxModelForm):
     """
@@ -30,9 +28,8 @@ class ConfigSetForm(NetBoxModelForm):
         fields = ('name', 'description', 'config_items', 'values', 'tags')
 
 class ConfigSetFilterForm(NetBoxModelFilterSetForm):
-     class Meta:
-        model = ConfigSet
-        fields = ['name', 'description']
+    model = ConfigSet
+
             
 class OSConfigForm(NetBoxModelForm):
     """
@@ -43,6 +40,4 @@ class OSConfigForm(NetBoxModelForm):
         fields = ('name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific', 'description', 'state', 'tags')
         
 class OSConfigFilterForm(NetBoxModelFilterSetForm):
-     class Meta:
-        model = OSConfig
-        fields = ['name', 'description']
+    model = OSConfig
