@@ -58,12 +58,18 @@ class ConfigSetEditView(generic.ObjectEditView):
     form = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
+    def get_object(self, **kwargs):
+        # Handle creation (no pk) or editing (with pk)
+        if 'pk' in self.kwargs:
+            return super().get_object(**kwargs)
+        return None  # For creation
+
     def get_extra_context(self, request, instance):
-        # Prepare formset initial data
-        initial_data = [
-            {'config_item': ci, 'value': instance.values.get(ci.name, '')}
-            for ci in instance.config_items.all()
-        ]
+        initial_data = (
+            [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
+             for ci in instance.config_items.all()]
+            if instance else []
+        )
         formset = ConfigItemValueFormSet(
             request.POST if request.method == 'POST' else None,
             initial=initial_data
@@ -76,10 +82,10 @@ class ConfigSetEditView(generic.ObjectEditView):
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            # Save the ConfigSet instance
-            obj = form.save(commit=False)
-            
-            # Update config_items and values from formset
+            # Save the instance first to ensure it has an id
+            obj = form.save()
+
+            # Process formset data
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
@@ -87,7 +93,8 @@ class ConfigSetEditView(generic.ObjectEditView):
                     config_item = form_data['config_item']
                     config_items.add(config_item)
                     values[config_item.name] = form_data['value']
-            
+
+            # Update ManyToManyField and JSONField
             obj.config_items.set(config_items)
             obj.values = values
             obj.save()
@@ -96,7 +103,7 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def get_success_url(self):
         return reverse_lazy('plugins:os_config_management:configset', kwargs={'pk': self.get_object().pk})
-
+    
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()
 
