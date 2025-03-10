@@ -1,36 +1,56 @@
 <!-- templates/os_config_management/configset_edit.html -->
-{% extends 'generic/object.html' %}
+{% extends 'generic/object_edit.html' %}
+{% load static %}
+{% load form_helpers %}
 
-{% block content %}
-  <h2>{% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}</h2>
-  <form method="post" id="configset-form">
-    {% csrf_token %}
-    {{ form.as_p }}
-    
-    <h3>Config Items</h3>
-    {{ formset.management_form }}
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Config Item</th>
-          <th>Value</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody id="formset-rows">
-        {% for form in formset %}
-          <tr class="formset-row">
-            <td>{{ form.config_item }}</td>
-            <td>{{ form.value }}</td>
-            <td>{{ form.DELETE }} <button type="button" class="btn btn-danger delete-row">Delete</button></td>
+{% block title %}
+  {% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}
+{% endblock %}
+
+{% block form %}
+  <div class="card">
+    <div class="card-header">
+      <h3>ConfigSet Details</h3>
+    </div>
+    <div class="card-body">
+      {{ form|render_form }}
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-header">
+      <h3>Config Items</h3>
+    </div>
+    <div class="card-body">
+      {{ formset.management_form }}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Config Item</th>
+            <th>Value</th>
+            <th>Delete</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <button type="button" id="add-row" class="btn btn-primary">Add Row</button>
-    <button type="submit" class="btn btn-success">Save</button>
-  </form>
+        </thead>
+        <tbody id="formset-rows">
+          {% for form in formset %}
+            <tr class="formset-row">
+              <td>{{ form.config_item|render_field }}</td>
+              <td>{{ form.value|render_field }}</td>
+              <td>
+                {{ form.DELETE|render_field }}
+                <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="button" id="add-row" class="btn btn-primary btn-sm">Add Row</button>
+    </div>
+  </div>
+{% endblock %}
 
+{% block javascript %}
+  {{ block.super }}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const formsetRows = document.getElementById('formset-rows');
@@ -66,12 +86,12 @@
         }
       });
 
-      // Dynamic value field update
+      // Dynamic value field update (requires an API endpoint)
       formsetRows.addEventListener('change', function(e) {
         if (e.target.classList.contains('config-item-select')) {
           const row = e.target.closest('.formset-row');
           const configItemId = e.target.value;
-          fetch(`/api/plugins/os-config-management/configitems/${configItemId}/`)
+          fetch(`/api/plugins/os-config-management/config-items/${configItemId}/`)
             .then(response => response.json())
             .then(data => {
               const valueField = row.querySelector('.config-value');
