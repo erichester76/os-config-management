@@ -55,16 +55,23 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm
+    form_class = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
-        # Handle creation (no pk) or editing (with pk)
+        # Return existing object if pk is provided, otherwise None for creation
         if 'pk' in self.kwargs:
             return super().get_object(**kwargs)
-        return None  # For creation
+        return None
+
+    def get_form(self, form_class=None):
+        # Ensure form works with instance=None for creation
+        if form_class is None:
+            form_class = self.form_class
+        return form_class(self.request.POST if self.request.method == 'POST' else None, instance=self.get_object())
 
     def get_extra_context(self, request, instance):
+        # Prepare formset initial data, empty if instance is None
         initial_data = (
             [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
              for ci in instance.config_items.all()]
@@ -77,12 +84,12 @@ class ConfigSetEditView(generic.ObjectEditView):
         return {'formset': formset}
 
     def post(self, request, *args, **kwargs):
-        obj = self.get_object()
+        obj = self.get_object()  # Could be None for creation
         form = self.get_form()
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            # Save the instance first to ensure it has an id
+            # Save the instance (creates new if obj was None)
             obj = form.save()
 
             # Process formset data
@@ -98,11 +105,12 @@ class ConfigSetEditView(generic.ObjectEditView):
             obj.config_items.set(config_items)
             obj.values = values
             obj.save()
-            return self.form_valid(form)
+            return self.form_valid(form)  # Sets self.object and redirects
         return self.form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('plugins:os_config_management:configset', kwargs={'pk': self.get_object().pk})
+        # Use self.object (set by form_valid) instead of get_object()
+        return reverse_lazy('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()

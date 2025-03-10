@@ -2,7 +2,7 @@
 {% extends 'generic/object.html' %}
 
 {% block content %}
-  <h2>Edit ConfigSet: {{ configset.name }}</h2>
+  <h2>{% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}</h2>
   <form method="post" id="configset-form">
     {% csrf_token %}
     {{ form.as_p }}
@@ -22,12 +22,12 @@
           <tr class="formset-row">
             <td>{{ form.config_item }}</td>
             <td>{{ form.value }}</td>
-            <td>{{ form.DELETE }} <button type="button" class="btn btn-danger delete-row">Delete Item</button></td>
+            <td>{{ form.DELETE }} <button type="button" class="btn btn-danger delete-row">Delete</button></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
-    <button type="button" id="add-row" class="btn btn-primary">Add Item</button>
+    <button type="button" id="add-row" class="btn btn-primary">Add Row</button>
     <button type="submit" class="btn btn-success">Save</button>
   </form>
 
