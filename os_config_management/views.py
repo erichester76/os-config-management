@@ -7,7 +7,7 @@ from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigSetFilterF
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
     queryset = ConfigItem.objects.all()
-    table_class = ConfigItemTable
+    table = ConfigItemTable
     filterset = ConfigItemFilterSet
     filterset_form = ConfigItemFilterForm
 
@@ -16,7 +16,7 @@ class ConfigItemView(generic.ObjectView):
 
 class ConfigItemEditView(generic.ObjectEditView):
     queryset = ConfigItem.objects.all()
-    form_class = ConfigItemForm
+    form = ConfigItemForm
 
 class ConfigItemDeleteView(generic.ObjectDeleteView):
     queryset = ConfigItem.objects.all()
@@ -24,7 +24,7 @@ class ConfigItemDeleteView(generic.ObjectDeleteView):
 # ConfigSet Views
 class ConfigSetListView(generic.ObjectListView):
     queryset = ConfigSet.objects.all()
-    table_class = ConfigSetTable
+    table = ConfigSetTable
     filterset = ConfigSetFilterSet
     filterset_form = ConfigSetFilterForm
 
@@ -33,7 +33,7 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form_class = ConfigSetForm
+    form = ConfigSetForm
 
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()
@@ -41,7 +41,7 @@ class ConfigSetDeleteView(generic.ObjectDeleteView):
 # OSConfig Views
 class OSConfigListView(generic.ObjectListView):
     queryset = OSConfig.objects.all()
-    table_class = OSConfigTable
+    table = OSConfigTable
     filterset = OSConfigFilterSet
     filterset_form = OSConfigFilterForm
 
@@ -50,7 +50,7 @@ class OSConfigView(generic.ObjectView):
 
 class OSConfigEditView(generic.ObjectEditView):
     queryset = OSConfig.objects.all()
-    form_class = OSConfigForm
+    form = OSConfigForm
 
 class OSConfigDeleteView(generic.ObjectDeleteView):
     queryset = OSConfig.objects.all()
