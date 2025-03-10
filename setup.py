@@ -16,6 +16,6 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    packages=find_packages(),  # Automatically discover Python packages
-    include_package_data=True,  # Include additional files from MANIFEST.in
+    packages=find_packages(),
+    include_package_data=True, 
 )
