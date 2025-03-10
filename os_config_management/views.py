@@ -60,19 +60,14 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def get_extra_context(self, request, instance):
         # Prepare formset initial data, empty if instance is None
-        initial_data = (
-            [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
-             for ci in instance.config_items.all()]
-            if instance else []
-        )
         formset = ConfigItemValueFormSet(
-            request.POST if request.method == 'POST' else None,
-            initial=initial_data
+            request.POST if request.method == "POST" else None,
+            initial=instance.values if instance else [],
         )
         return {'formset': formset}
 
     def post(self, request, *args, **kwargs):
-        obj = self.get_object()  # Could be None for creation
+        obj = self.get_object()
         form = self.get_form()
         formset = ConfigItemValueFormSet(request.POST)
 
