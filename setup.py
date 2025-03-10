@@ -1,17 +1,21 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='os-config-management',
-    version='0.1',
-    description='A NetBox plugin to manage OS-level configuration hierarchies for virtual machines.',
-    author='Eric Hester',
-    author_email='hester1@clemson.edu',
-    url='https://github.com/erichester76/os-config-management',
-    license='Apache 2.0',
-    packages=find_packages(),
-    include_package_data=True,
+    name="os-config-management", 
+    version="0.1.0", 
+    author="Eric Hester",
+    author_email="hester1@clemson.edu",
+    description="Netbox Plugin for Configuring OS-level Configuration Hierarchies for Virtual Machines",
+    long_description_content_type="text/markdown",
     classifiers=[
-        'Framework :: Django',
-        'Programming Language :: Python :: 3',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
+    packages=find_packages(),  # Automatically discover Python packages
+    include_package_data=True,  # Include additional files from MANIFEST.in
 )

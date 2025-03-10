@@ -1,14 +1,14 @@
 from netbox.plugins import PluginConfig
 
-class OSConfigConfig(PluginConfig):
+class OSMgmtConfig(PluginConfig):
     name = 'os_config_management'
-    verbose_name = 'OS Configuration Hierarchy'
-    description = 'A plugin to manage OS-level configuration hierarchies for virtual machines.'
-    version = '0.1'
-    author = 'Eric hester'
+    verbose_name = 'OS Config Management'
+    description = 'Netbox Plugin for Configuring OS-level Configuration Hierarchies for Virtual Machines'
+    version = '0.1.0'
+    author = 'Eric Hester'
     author_email = 'hester1@clemson.edu'
     base_url = 'os-config'
-    required_settings = []
-    default_settings = {}
+    min_version = '4.1.0'
+    max_version = '4.2.99'
 
-config = OSConfigConfig
+config = OSMgmtConfig
