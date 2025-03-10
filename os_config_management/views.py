@@ -37,7 +37,7 @@ class ConfigItemBulkDeleteView(generic.BulkDeleteView):
     filterset = ConfigItemFilterSet
     table_class = ConfigItemTable
 
-class ConfigItemImportView(generic.ObjectImportView):
+class ConfigItemImportView(generic.BulkImportView):
     queryset = ConfigItem.objects.all()
     model_form = ConfigItemImportForm
     model = ConfigItem
@@ -73,7 +73,7 @@ class ConfigSetBulkDeleteView(generic.BulkDeleteView):
     filterset = ConfigSetFilterSet
     table_class = ConfigSetTable
 
-class ConfigSetImportView(generic.ObjectImportView):
+class ConfigSetImportView(generic.BulkImportView):
     queryset = ConfigSet.objects.all()
     model_form = ConfigSetImportForm
     model = ConfigSet
@@ -109,7 +109,7 @@ class OSConfigBulkDeleteView(generic.BulkDeleteView):
     filterset = OSConfigFilterSet
     table_class = OSConfigTable
 
-class OSConfigImportView(generic.ObjectImportView):
+class OSConfigImportView(generic.BulkImportView):
     queryset = OSConfig.objects.all()
     model_form = OSConfigImportForm
     model = OSConfig
