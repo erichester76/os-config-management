@@ -2,6 +2,7 @@ from django.db import models
 from netbox.models import NetBoxModel
 from django.core.exceptions import ValidationError
 import logging
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,10 @@ class ConfigItem(NetBoxModel):
         if not self.name or not self.name.strip():
             raise ValidationError("Name cannot be empty.")
         super().clean()
+        
+    def get_absolute_url(self):
+        return reverse('plugins:os_config_management:configitem', kwargs={'pk': self.pk})
+
 
 class ConfigSet(NetBoxModel):
     """
@@ -92,6 +97,10 @@ class ConfigSet(NetBoxModel):
         self.clean()
         logger.debug(f"Saving ConfigSet: {self.name}, Values: {self.values}")
         super().save(*args, **kwargs)
+        
+    def get_absolute_url(self):
+        return reverse('plugins:os_config_management:configset', kwargs={'pk': self.pk})
+
 
 class OSConfig(NetBoxModel):
     """
@@ -206,3 +215,6 @@ class OSConfig(NetBoxModel):
                     merged_config.update(config_set.values)
 
         return merged_config
+    
+    def get_absolute_url(self):
+        return reverse('plugins:os_config_management:osconfig', kwargs={'pk': self.pk})
