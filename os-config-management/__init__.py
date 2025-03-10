@@ -1,7 +1,7 @@
 from netbox.plugins import PluginConfig
 
 class OSConfigConfig(PluginConfig):
-    name = 'netbox_os_config'
+    name = 'os_config_management'
     verbose_name = 'OS Configuration Hierarchy'
     description = 'A plugin to manage OS-level configuration hierarchies for virtual machines.'
     version = '0.1'

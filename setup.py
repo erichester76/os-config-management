@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='netbox-os-config',
+    name='os-config-management',
     version='0.1',
     description='A NetBox plugin to manage OS-level configuration hierarchies for virtual machines.',
     author='Eric hester',
