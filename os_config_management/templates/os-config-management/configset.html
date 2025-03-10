@@ -1,0 +1,23 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ object.name }}</h1>
+            <dl class="dl-horizontal">
+                <dt>Description</dt>
+                <dd>{{ object.description }}</dd>
+                <dt>Config Items</dt>
+                <dd>{{ object.config_items.all|join:", "|default:"None" }}</dd>
+                <dt>Values</dt>
+                <dd>{{ object.values|default:"None" }}</dd>
+                <dt>Created</dt>
+                <dd>{{ object.created }}</dd>
+                <dt>Last Updated</dt>
+                <dd>{{ object.last_updated }}</dd>
+                <dt>Tags</dt>
+                <dd>{{ object.tags.all|join:", "|default:"None" }}</dd>
+            </dl>
+        </div>
+    </div>
+{% endblock %}
