@@ -58,18 +58,6 @@ class ConfigSetEditView(generic.ObjectEditView):
     form = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
-    def get_object(self, **kwargs):
-        # Return existing object if pk is provided, otherwise None for creation
-        if 'pk' in self.kwargs:
-            return super().get_object(**kwargs)
-        return None
-
-    def get_form(self, form_class=None):
-        # Ensure form works with instance=None for creation
-        if form_class is None:
-            form_class = self.form_class
-        return form_class(self.request.POST if self.request.method == 'POST' else None, instance=self.get_object())
-
     def get_extra_context(self, request, instance):
         # Prepare formset initial data, empty if instance is None
         initial_data = (
