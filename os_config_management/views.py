@@ -53,9 +53,16 @@ class ConfigSetListView(generic.ObjectListView):
 class ConfigSetView(generic.ObjectView):
     queryset = ConfigSet.objects.all()
 
+# views.py
+from netbox.views import generic
+from django.urls import reverse_lazy
+from django.shortcuts import render
+from .models import ConfigSet
+from .forms import ConfigSetForm, ConfigItemValueFormSet
+
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm
+    form = ConfigSetForm  # Using form = instead of form_class =
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
@@ -64,7 +71,6 @@ class ConfigSetEditView(generic.ObjectEditView):
         return None
 
     def get_form(self, form_class=None):
-        # Use the pre-defined form attribute and instantiate it with the request data and object
         form_instance = self.form(
             self.request.POST if self.request.method == 'POST' else None,
             instance=self.get_object()
@@ -89,7 +95,7 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        form = self.get_form()  # Uses self.form
+        form = self.get_form()
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
@@ -107,6 +113,13 @@ class ConfigSetEditView(generic.ObjectEditView):
             return self.form_valid(form)
         return self.form_invalid(form)
 
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        form = self.get_form()
+        extra_context = self.get_extra_context(request, obj)
+        context = self.get_context_data(form=form, object=obj, **extra_context)
+        return render(request, self.template_name, context)
+
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
@@ -114,12 +127,6 @@ class ConfigSetEditView(generic.ObjectEditView):
         if url is None:
             raise ValueError("reverse_lazy returned None")
         return url
-
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()  # Uses self.form
-        extra_context = self.get_extra_context(request, obj)
-        return self.render_to_response(self.get_context_data(form=form, **extra_context))
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()
