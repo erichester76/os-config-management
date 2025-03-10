@@ -28,12 +28,12 @@ class ConfigItemBulkEditView(generic.BulkEditView):
     queryset = ConfigItem.objects.all()
     filterset = ConfigItemFilterSet
     table = ConfigItemTable
-    form_class = ConfigItemForm
+    form = ConfigItemForm
 
 class ConfigItemBulkDeleteView(generic.BulkDeleteView):
     queryset = ConfigItem.objects.all()
     filterset = ConfigItemFilterSet
-    table_class = ConfigItemTable
+    table = ConfigItemTable
 
 class ConfigItemImportView(generic.BulkImportView):
     queryset = ConfigItem.objects.all()
@@ -55,7 +55,7 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form_class = ConfigSetForm
+    form = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
     def get_extra_context(self, request, instance):
