@@ -2,14 +2,14 @@ from netbox.views import generic
 from .models import ConfigItem, ConfigSet, OSConfig
 from .tables import ConfigItemTable, ConfigSetTable, OSConfigTable
 from .filters import ConfigItemFilterSet, ConfigSetFilterSet, OSConfigFilterSet
-from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm
+from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigSetFilterForm, OSConfigFilterForm, ConfigItemFilterForm
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
     queryset = ConfigItem.objects.all()
     table_class = ConfigItemTable
     filterset = ConfigItemFilterSet
-    #filterset_form = None
+    filterset_form = ConfigItemFilterForm
 
 class ConfigItemView(generic.ObjectView):
     queryset = ConfigItem.objects.all()
@@ -26,7 +26,7 @@ class ConfigSetListView(generic.ObjectListView):
     queryset = ConfigSet.objects.all()
     table_class = ConfigSetTable
     filterset = ConfigSetFilterSet
-    #filterset_form = None
+    filterset_form = ConfigSetFilterForm
 
 class ConfigSetView(generic.ObjectView):
     queryset = ConfigSet.objects.all()
@@ -43,7 +43,7 @@ class OSConfigListView(generic.ObjectListView):
     queryset = OSConfig.objects.all()
     table_class = OSConfigTable
     filterset = OSConfigFilterSet
-    #filterset_form = None
+    filterset_form = OSConfigFilterForm
 
 class OSConfigView(generic.ObjectView):
     queryset = OSConfig.objects.all()

@@ -1,7 +1,7 @@
 from django import forms
-from netbox.forms import NetBoxModelForm
 from .models import ConfigItem, ConfigSet, OSConfig
 from utilities.forms.fields import JSONField
+from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilterSetForm
 
 class ConfigItemForm(NetBoxModelForm):
     """
@@ -11,6 +11,11 @@ class ConfigItemForm(NetBoxModelForm):
         model = ConfigItem
         fields = ('name', 'type', 'description', 'required', 'tags')
 
+class ConfigItemFilterForm(NetBoxModelFilterSetForm):
+     class Meta:
+        model = ConfigItem
+        fields = ['name', 'description']    
+        
 class ConfigSetForm(NetBoxModelForm):
     """
     Form for creating and editing ConfigSet objects.
@@ -24,6 +29,11 @@ class ConfigSetForm(NetBoxModelForm):
         model = ConfigSet
         fields = ('name', 'description', 'config_items', 'values', 'tags')
 
+class ConfigSetFilterForm(NetBoxModelFilterSetForm):
+     class Meta:
+        model = ConfigSet
+        fields = ['name', 'description']
+            
 class OSConfigForm(NetBoxModelForm):
     """
     Form for creating and editing OSConfig objects.
@@ -31,3 +41,8 @@ class OSConfigForm(NetBoxModelForm):
     class Meta:
         model = OSConfig
         fields = ('name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific', 'description', 'state', 'tags')
+        
+class OSConfigFilterForm(NetBoxModelFilterSetForm):
+     class Meta:
+        model = OSConfig
+        fields = ['name', 'description']
