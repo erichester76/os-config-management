@@ -2,19 +2,19 @@ from netbox.plugins import PluginMenu, PluginMenuItem, PluginMenuButton
 
 items = (
     PluginMenuItem(
-        link='plugins:netbox_os_config:configitem_list',
+        link='plugins:os_config_management:configitem_list',
         link_text='Config Items',
-        permissions=['netbox_os_config.view_configitem']
+        permissions=['os_config_management.view_configitem']
     ),
     PluginMenuItem(
-        link='plugins:netbox_os_config:configset_list',
+        link='plugins:os_config_management:configset_list',
         link_text='Config Sets',
-        permissions=['netbox_os_config.view_configset']
+        permissions=['os_config_management.view_configset']
     ),
     PluginMenuItem(
-        link='plugins:netbox_os_config:osconfig_list',
+        link='plugins:os_config_management:osconfig_list',
         link_text='OS Configurations',
-        permissions=['netbox_os_config.view_osconfig']
+        permissions=['os_config_management.view_osconfig']
     ),
 )
 
