@@ -6,7 +6,7 @@ setup(
     description='A NetBox plugin to manage OS-level configuration hierarchies for virtual machines.',
     author='Eric hester',
     author_email='hester1@clemson.edu',
-    url='https://github.com/erichester76/netbox-os-config',
+    url='https://github.com/erichester76/os-config-management',
     license='Apache 2.0',
     packages=find_packages(),
     include_package_data=True,
