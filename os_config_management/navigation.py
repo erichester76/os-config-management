@@ -19,7 +19,7 @@ items = (
 )
 
 menu = PluginMenu(
-    label='OS Configuration Management',
+    label='OS Config Management',
     icon_class='mdi mdi-harddisk',
     groups=(('OS Configuration', items),)
 )
