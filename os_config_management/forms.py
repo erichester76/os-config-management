@@ -14,6 +14,11 @@ class ConfigItemForm(NetBoxModelForm):
 class ConfigItemFilterForm(NetBoxModelFilterSetForm):
     model = ConfigItem
         
+class ConfigItemImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = ConfigItem
+        fields = ('name', 'type', 'description', 'required')
+        
 class ConfigSetForm(NetBoxModelForm):
     """
     Form for creating and editing ConfigSet objects.
@@ -30,6 +35,10 @@ class ConfigSetForm(NetBoxModelForm):
 class ConfigSetFilterForm(NetBoxModelFilterSetForm):
     model = ConfigSet
 
+class ConfigSetImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = ConfigSet
+        fields = ('name', 'description', 'config_items', 'values', 'tags')
             
 class OSConfigForm(NetBoxModelForm):
     """
@@ -41,3 +50,8 @@ class OSConfigForm(NetBoxModelForm):
         
 class OSConfigFilterForm(NetBoxModelFilterSetForm):
     model = OSConfig
+    
+class OSConfigImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = OSConfig
+        fields = ('name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific', 'description', 'state', 'tags')
