@@ -3,16 +3,11 @@ from .models import ConfigItem, ConfigSet, OSConfig
 from .tables import ConfigItemTable, ConfigSetTable, OSConfigTable
 from .filters import ConfigItemFilterSet, ConfigSetFilterSet, OSConfigFilterSet
 from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigItemFilterForm, ConfigSetFilterForm, OSConfigFilterForm, ConfigItemImportForm, ConfigSetImportForm, OSConfigImportForm    
-from utilities.forms import CSVModelForm
-import csv
-from io import StringIO
-from django.http import HttpResponse
-from django import forms
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
     queryset = ConfigItem.objects.all()
-    table_class = ConfigItemTable
+    table = ConfigItemTable
     filterset = ConfigItemFilterSet
     filterset_form = ConfigItemFilterForm
 
@@ -29,7 +24,7 @@ class ConfigItemDeleteView(generic.ObjectDeleteView):
 class ConfigItemBulkEditView(generic.BulkEditView):
     queryset = ConfigItem.objects.all()
     filterset = ConfigItemFilterSet
-    table_class = ConfigItemTable
+    table = ConfigItemTable
     form_class = ConfigItemForm
 
 class ConfigItemBulkDeleteView(generic.BulkDeleteView):
@@ -48,7 +43,7 @@ class ConfigItemChangeLogView(generic.ObjectChangeLogView):
 # ConfigSet Views
 class ConfigSetListView(generic.ObjectListView):
     queryset = ConfigSet.objects.all()
-    table_class = ConfigSetTable
+    table = ConfigSetTable
     filterset = ConfigSetFilterSet
     filterset_form = ConfigSetFilterForm
 
@@ -65,7 +60,7 @@ class ConfigSetDeleteView(generic.ObjectDeleteView):
 class ConfigSetBulkEditView(generic.BulkEditView):
     queryset = ConfigSet.objects.all()
     filterset = ConfigSetFilterSet
-    table_class = ConfigSetTable
+    table = ConfigSetTable
     form_class = ConfigSetForm
 
 class ConfigSetBulkDeleteView(generic.BulkDeleteView):
@@ -84,7 +79,7 @@ class ConfigSetChangeLogView(generic.ObjectChangeLogView):
 # OSConfig Views
 class OSConfigListView(generic.ObjectListView):
     queryset = OSConfig.objects.all()
-    table_class = OSConfigTable
+    table = OSConfigTable
     filterset = OSConfigFilterSet
     filterset_form = OSConfigFilterForm
 
@@ -101,13 +96,13 @@ class OSConfigDeleteView(generic.ObjectDeleteView):
 class OSConfigBulkEditView(generic.BulkEditView):
     queryset = OSConfig.objects.all()
     filterset = OSConfigFilterSet
-    table_class = OSConfigTable
+    table = OSConfigTable
     form_class = OSConfigForm
 
 class OSConfigBulkDeleteView(generic.BulkDeleteView):
     queryset = OSConfig.objects.all()
     filterset = OSConfigFilterSet
-    table_class = OSConfigTable
+    table = OSConfigTable
 
 class OSConfigImportView(generic.BulkImportView):
     queryset = OSConfig.objects.all()
