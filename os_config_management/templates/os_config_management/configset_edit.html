@@ -63,16 +63,14 @@
           </div>
         </div>
         <div class="col-md-2">
-          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove Row</button>
         </div>
       </div>
     </div>
 
   </div>
-{% endblock %}
 
-{% block javascript %}
-  <script>
+<script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
       const totalForms = container.querySelector('input[name="form-TOTAL_FORMS"]');
@@ -80,9 +78,8 @@
       const emptyForm = container.querySelector('.empty-form').innerHTML.replace(/__prefix__/g, formIdx);
       const cardBody = container.querySelector('.card-body');
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = emptyForm.trim();
-      const newRow = tempDiv.firstChild;
-      cardBody.appendChild(newRow);
+      tempDiv.innerHTML = emptyForm;
+      cardBody.appendChild(tempDiv);
       totalForms.value = formIdx + 1;
     }
 
@@ -94,5 +91,6 @@
         totalForms.value = parseInt(totalForms.value) - 1;
       }
     }
+
   </script>
 {% endblock %}
