@@ -104,8 +104,8 @@ class ConfigSetEditView(generic.ObjectEditView):
             obj.values = values
             obj.save()
             return self.form_valid(form)
-        return self.form_invalid(form)
-
+        return render(request, self.template_name, obj)    
+     
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
