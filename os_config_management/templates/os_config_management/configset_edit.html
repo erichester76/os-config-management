@@ -4,7 +4,7 @@
 {% load form_helpers %}
 
 {% block title %}
-  {% if object %}Edit Config Set: {{ object.name }}{% else %}Create New Config Set{% endif %}
+  {% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}
 {% endblock %}
 
 {% block form %}
@@ -18,33 +18,54 @@
     </div>
   </div>
 
-  <div class="card mt-3">
+  <div class="card mt-3" id="formset-container">
     <div class="card-header">
       <h3>Config Items</h3>
     </div>
     <div class="card-body">
       {{ formset.management_form }}
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Config Item</th>
-            <th>Value</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="formset-rows">
-          {% for form in formset %}
-            <tr class="formset-row">
-              <td>{{ form.config_item }}</td>
-              <td>{{ form.value }}</td>
-              <td>
-                <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <button type="button" id="add-row" class="btn btn-primary btn-sm">Add Row</button>
+      {% for form in formset %}
+        <div class="row align-items-center mb-2 formset-row">
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="{{ form.config_item.id_for_label }}">Config Item</label>
+              {{ form.config_item }}
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="{{ form.value.id_for_label }}">Value</label>
+              {{ form.value }}
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary btn-sm" onclick="addRow('formset-container')">Add Row</button>
+    </div>
+    <!-- Hidden empty form -->
+    <div class="d-none empty-form">
+      <div class="row align-items-center mb-2 formset-row">
+        <div class="col-md-5">
+          <div class="form-group">
+            <label for="{{ formset.empty_form.config_item.id_for_label }}">Config Item</label>
+            {{ formset.empty_form.config_item }}
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <label for="{{ formset.empty_form.value.id_for_label }}">Value</label>
+            {{ formset.empty_form.value }}
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
@@ -52,91 +73,26 @@
 {% block javascript %}
   {{ block.super }}
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const formsetRows = document.getElementById('formset-rows');
-      const addRowButton = document.getElementById('add-row');
-      const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    function addRow(containerId) {
+      const container = document.getElementById(containerId);
+      const totalForms = container.querySelector('input[name="form-TOTAL_FORMS"]');
+      const formIdx = parseInt(totalForms.value);
+      const emptyForm = container.querySelector('.empty-form').innerHTML.replace(/__prefix__/g, formIdx);
+      const cardBody = container.querySelector('.card-body');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = emptyForm.trim();
+      const newRow = tempDiv.firstChild;
+      cardBody.appendChild(newRow);
+      totalForms.value = formIdx + 1;
+    }
 
-      if (!formsetRows || !addRowButton || !totalForms) {
-        console.error("Formset elements not found");
-        return;
+    function removeRow(button) {
+      const row = button.closest('.formset-row');
+      if (row) {
+        row.remove();
+        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+        totalForms.value = parseInt(totalForms.value) - 1;
       }
-
-      // Add new row
-      addRowButton.addEventListener('click', function() {
-        const rowCount = parseInt(totalForms.value);
-        const newRow = formsetRows.children[0].cloneNode(true);
-
-        // Update input names and IDs
-        newRow.querySelectorAll('input, select').forEach(input => {
-          input.name = input.name.replace(/-\d+-/, `-${rowCount}-`);
-          input.id = input.id.replace(/-\d+-/, `-${rowCount}-`);
-          if (input.type === 'select-one') {
-            // Destroy existing Select2 instance
-            $(input).select2('destroy');
-            // Reset value
-            input.selectedIndex = 0;
-          } else if (input.type === 'checkbox') {
-            input.checked = false;
-          } else {
-            input.value = '';
-          }
-        });
-
-        formsetRows.appendChild(newRow);
-
-        // Reinitialize Select2 on the new select element
-        newRow.querySelectorAll('select.config-item-select').forEach(select => {
-          $(select).select2({
-            width: '100%', // Match NetBox styling
-            placeholder: 'Select a Config Item',
-            allowClear: true
-          });
-        });
-
-        totalForms.value = rowCount + 1;
-      });
-
-      // Delete row
-      formsetRows.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-row')) {
-          const row = e.target.closest('.formset-row');
-          if (formsetRows.children.length > 1) {
-            // Destroy Select2 before removing
-            row.querySelectorAll('select.config-item-select').forEach(select => {
-              $(select).select2('destroy');
-            });
-            row.remove();
-            totalForms.value = parseInt(totalForms.value) - 1;
-          }
-        }
-      });
-
-      // Dynamic value field update
-      formsetRows.addEventListener('change', function(e) {
-        if (e.target.classList.contains('config-item-select')) {
-          const row = e.target.closest('.formset-row');
-          const configItemId = e.target.value;
-          if (configItemId) {
-            fetch(`/api/plugins/os-config/configitems/${configItemId}/`)
-              .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-              })
-              .then(data => {
-                const valueField = row.querySelector('.config-value');
-                if (data.type === 'boolean') {
-                  valueField.outerHTML = `<input type="checkbox" name="${valueField.name}" class="form-check-input config-value">`;
-                } else if (data.type === 'list') {
-                  valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value" placeholder="Comma-separated list">`;
-                } else {
-                  valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value">`;
-                }
-              })
-              .catch(error => console.error('Error fetching ConfigItem:', error));
-          }
-        }
-      });
-    });
+    }
   </script>
 {% endblock %}
