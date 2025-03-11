@@ -68,20 +68,6 @@ class ConfigSetEditView(generic.ObjectEditView):
     form = ConfigSetForm  # Using form = as requested
     template_name = 'os_config_management/configset_edit.html'
 
-    def get_object(self, **kwargs):
-        if 'pk' in self.kwargs:
-            return super().get_object(**kwargs)
-        return None
-
-    def get_form(self, form_class=None):
-        form_instance = self.form(
-            self.request.POST if self.request.method == 'POST' else None,
-            instance=self.get_object()
-        )
-        if form_instance is None:
-            raise ValueError("Form instantiation returned None")
-        return form_instance
-
     def get_extra_context(self, request, instance):
         initial_data = (
             [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
@@ -102,7 +88,7 @@ class ConfigSetEditView(generic.ObjectEditView):
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            if obj:  # Editing an existing ConfigSet
+            if obj: 
                 form.instance = obj  
             config_items = set()
             values = {}
@@ -115,7 +101,6 @@ class ConfigSetEditView(generic.ObjectEditView):
             obj.save()
             return self.form_valid(form)
         else:
-            # Build context manually without get_context_data()
             context = {
                 'form': form,
                 'formset': formset,
