@@ -38,7 +38,8 @@
               <td>{{ form.config_item }}</td>
               <td>{{ form.value }}</td>
               <td>
-              <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
+                {{ form.DELETE }}
+                <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
               </td>
             </tr>
           {% endfor %}
