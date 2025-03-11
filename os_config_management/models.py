@@ -95,7 +95,6 @@ class ConfigSet(NetBoxModel):
 
     def save(self, *args, **kwargs):
         self.clean()
-        logger.debug(f"Saving ConfigSet: {self.name}, Values: {self.values}")
         super().save(*args, **kwargs)
         
     def get_absolute_url(self):
@@ -159,10 +158,6 @@ class OSConfig(NetBoxModel):
 
     def __str__(self):
         return f"{self.name} (Parent: {self.parent.name if self.parent else 'None'}, Type: {self.hierarchy_type})"
-
-    def save(self, *args, **kwargs):
-        logger.debug(f"Saving OSConfig: {self.name}, Parent: {self.parent}, ConfigSets: {self.config_sets.count()}")
-        super().save(*args, **kwargs)
 
     def get_inherited_config(self):
         """

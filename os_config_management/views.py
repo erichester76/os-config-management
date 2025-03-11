@@ -158,18 +158,19 @@ class OSConfigEditView(generic.ObjectEditView):
         return None
 
     def get_form(self, form_class=None):
+        obj = self.get_object()
         form_instance = self.form(
             self.request.POST if self.request.method == 'POST' else None,
-            instance=self.get_object()
+            instance=obj
         )
         if form_instance is None:
             raise ValueError("Form instantiation returned None")
-        # Add config_sets field dynamically
+        # Always add config_sets field, with initial data from the object if it exists
         form_instance.fields['config_sets'] = forms.ModelMultipleChoiceField(
             queryset=ConfigSet.objects.all(),
             required=False,
             widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
-            initial=self.get_object().config_sets.all() if self.get_object() else None
+            initial=obj.config_sets.all() if obj else None
         )
         return form_instance
 
@@ -178,11 +179,12 @@ class OSConfigEditView(generic.ObjectEditView):
         form = self.get_form()
 
         if form.is_valid():
-            obj = form.save(commit=False)  # Save without committing to handle config_sets
-            obj.save()  # Save the OSConfig instance to ensure it has an ID
-            # Update config_sets from the form
+            # Save the OSConfig instance first to ensure it has an ID
+            obj = form.save(commit=False)
+            obj.save()  # Save to DB, assigns ID
+            # Update config_sets after the instance is saved
             obj.config_sets.set(form.cleaned_data['config_sets'])
-            obj.save()  # Save again to update relationships
+            # No additional save() needed unless other fields changed
             return self.form_valid(form)
         else:
             # Re-render with errors
