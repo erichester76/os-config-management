@@ -4,7 +4,7 @@ from .tables import ConfigItemTable, ConfigSetTable, OSConfigTable
 from .filters import ConfigItemFilterSet, ConfigSetFilterSet, OSConfigFilterSet
 from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigItemFilterForm, ConfigSetFilterForm, OSConfigFilterForm, ConfigItemImportForm, ConfigSetImportForm, OSConfigImportForm , ConfigItemValueFormSet
 from netbox.views import generic
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.shortcuts import render
 
 # ConfigItem Views
@@ -109,9 +109,9 @@ class ConfigSetEditView(generic.ObjectEditView):
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
-        url = reverse_lazy('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
+        url = reverse('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
         if url is None:
-            raise ValueError("reverse_lazy returned None")
+            raise ValueError("reverse returned None")
         return url
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
