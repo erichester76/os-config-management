@@ -73,7 +73,7 @@ class ConfigItemValueForm(forms.Form):
 # Create the formset
 ConfigItemValueFormSet = forms.formset_factory(
     ConfigItemValueForm,
-    extra=1,  # Start with 1 empty row
+    extra=0,
     can_delete=True
 )
 

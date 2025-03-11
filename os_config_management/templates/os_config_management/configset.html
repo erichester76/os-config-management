@@ -1,24 +1,58 @@
 <!-- templates/os_config_management/configset.html -->
 {% extends 'generic/object.html' %}
+{% load static %}
+{% load helpers %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <h1>{{ object.name }}</h1>
-            <dl class="dl-horizontal">
-                <dt>Description</dt>
-                <dd>{{ object.description }}</dd>
-                <dt>Config Items</dt>
-                <dd>{{ object.config_items.all|join:", "|default:"None" }}</dd>
-                <dt>Values</dt>
-                <dd>{{ object.values|default:"None" }}</dd>
-                <dt>Created</dt>
-                <dd>{{ object.created }}</dd>
-                <dt>Last Updated</dt>
-                <dd>{{ object.last_updated }}</dd>
-                <dt>Tags</dt>
-                <dd>{{ object.tags.all|join:", "|default:"None" }}</dd>
-            </dl>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ object.name }}</h3>
         </div>
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Description</th>
+              <td>{{ object.description|default:"None" }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Config Items</th>
+              <td>{{ object.config_items.all|join:", "|default:"None" }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Values</th>
+              <td>
+                {% if object.values %}
+                  <pre>{{ object.values|json_script:"values" }}</pre>
+                {% else %}
+                  None
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Created</th>
+              <td>{{ object.created|default:"N/A" }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Last Updated</th>
+              <td>{{ object.last_updated|default:"N/A" }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Tags</th>
+              <td>
+                {% if object.tags.all %}
+                  {% for tag in object.tags.all %}
+                    <span class="badge" style="background-color: {{ tag.color|colorize }}; color: white;">{{ tag.name }}</span>
+                  {% endfor %}
+                {% else %}
+                  None
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 {% endblock %}
