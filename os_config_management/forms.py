@@ -85,7 +85,7 @@ class OSConfigForm(forms.ModelForm):
         model = OSConfig
         fields = [
             'name', 'description', 'parent', 'hierarchy_type', 'is_machine_specific',
-            'state'
+            'state', 'config_sets'
         ]
         widgets = {
             'parent': forms.Select(attrs={'class': 'form-control'}),
@@ -93,6 +93,7 @@ class OSConfigForm(forms.ModelForm):
             'is_machine_specific': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'state': forms.Select(attrs={'class': 'form-control'}),
+            'config_sets': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
