@@ -17,7 +17,7 @@ class ConfigItemImportForm(NetBoxModelImportForm):
         fields = ('name', 'type', 'description', 'required')
         
 
-class ConfigSetForm(forms.ModelForm):
+class ConfigSetForm(NetBoxModelForm):
     class Meta:
         model = ConfigSet
         fields = ['id', 'name', 'description']  

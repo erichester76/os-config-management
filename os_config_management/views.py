@@ -87,7 +87,7 @@ class ConfigSetEditView(generic.ObjectEditView):
         form = self.get_form()
         formset = ConfigItemValueFormSet(request.POST)
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             if obj: 
                 form.instance = obj  
             config_items = set()
@@ -109,11 +109,7 @@ class ConfigSetEditView(generic.ObjectEditView):
             return render(request, self.template_name, context)  
      
     def get_success_url(self):
-        if not self.object:
-            raise ValueError("self.object is None in get_success_url")
         url = reverse('plugins:os_config_management:configset_list', kwargs={'pk': self.object.pk})
-        if url is None:
-            raise ValueError("reverse returned None")
         return url
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
