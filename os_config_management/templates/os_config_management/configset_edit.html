@@ -3,10 +3,6 @@
 {% load static %}
 {% load form_helpers %}
 
-{% block title %}
-  {% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}
-{% endblock %}
-
 {% block form %}
   <div class="card">
     <div class="card-header">
@@ -76,12 +72,11 @@
 {% endblock %}
 
 {% block javascript %}
-  {{ block.super }}
   <script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
       const totalForms = container.querySelector('input[name="form-TOTAL_FORMS"]');
-      const formIdx = parseInt(totalForms.value);
+      const formIdx = totalForms.value;
       const emptyForm = container.querySelector('.empty-form').innerHTML.replace(/__prefix__/g, formIdx);
       const cardBody = container.querySelector('.card-body');
       const tempDiv = document.createElement('div');
