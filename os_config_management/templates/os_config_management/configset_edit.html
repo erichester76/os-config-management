@@ -35,10 +35,10 @@
         <tbody id="formset-rows">
           {% for form in formset %}
             <tr class="formset-row">
-              <td>{{ form.config_item|render_field }}</td>
-              <td>{{ form.value|render_field }}</td>
+              <td>{{ form.config_item }}</td>
+              <td>{{ form.value }}</td>
               <td>
-                {{ form.DELETE|render_field }}
+                {{ form.DELETE }}
                 <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
               </td>
             </tr>
