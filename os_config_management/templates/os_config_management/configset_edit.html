@@ -57,18 +57,28 @@
       const addRowButton = document.getElementById('add-row');
       const totalForms = document.getElementById('id_form-TOTAL_FORMS');
 
+      if (!formsetRows || !addRowButton || !totalForms) {
+        console.error("Formset elements not found");
+        return;
+      }
+
       // Add new row
       addRowButton.addEventListener('click', function() {
-        const rowCount = formsetRows.children.length;
+        const rowCount = parseInt(totalForms.value); // Use current totalForms value
         const newRow = formsetRows.children[0].cloneNode(true);
         newRow.querySelectorAll('input, select').forEach(input => {
           input.name = input.name.replace(/-\d+-/, `-${rowCount}-`);
           input.id = input.id.replace(/-\d+-/, `-${rowCount}-`);
-          if (input.type !== 'checkbox') input.value = '';
-          if (input.type === 'checkbox') input.checked = false;
+          if (input.type === 'select-one') {
+            input.selectedIndex = 0; // Reset dropdown to first option
+          } else if (input.type === 'checkbox') {
+            input.checked = false;
+          } else {
+            input.value = ''; // Clear text inputs
+          }
         });
         formsetRows.appendChild(newRow);
-        totalForms.value = parseInt(totalForms.value) + 1;
+        totalForms.value = rowCount + 1; // Increment total forms
       });
 
       // Delete row
@@ -77,31 +87,36 @@
           const row = e.target.closest('.formset-row');
           if (formsetRows.children.length > 1) {
             row.remove();
-            totalForms.value = parseInt(totalForms.value) - 1;
+            totalForms.value = parseInt(totalForms.value) - 1; // Decrement total forms
           }
         }
       });
 
-      // Dynamic value field update (requires an API endpoint)
+      // Dynamic value field update
       formsetRows.addEventListener('change', function(e) {
         if (e.target.classList.contains('config-item-select')) {
           const row = e.target.closest('.formset-row');
           const configItemId = e.target.value;
-          fetch(`/api/plugins/os-config/config-items/${configItemId}/`)
-            .then(response => response.json())
-            .then(data => {
-              const valueField = row.querySelector('.config-value');
-              if (data.type === 'boolean') {
-                valueField.outerHTML = `<input type="checkbox" name="${valueField.name}" class="form-check-input config-value">`;
-              } else if (data.type === 'list') {
-                valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value" placeholder="Comma-separated list">`;
-              } else {
-                valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value">`;
-              }
-            });
+          if (configItemId) { // Only fetch if a value is selected
+            fetch(`/api/plugins/os-config/configitems/${configItemId}/`)
+              .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+              })
+              .then(data => {
+                const valueField = row.querySelector('.config-value');
+                if (data.type === 'boolean') {
+                  valueField.outerHTML = `<input type="checkbox" name="${valueField.name}" class="form-check-input config-value">`;
+                } else if (data.type === 'list') {
+                  valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value" placeholder="Comma-separated list">`;
+                } else {
+                  valueField.outerHTML = `<input type="text" name="${valueField.name}" class="form-control config-value">`;
+                }
+              })
+              .catch(error => console.error('Error fetching ConfigItem:', error));
+          }
         }
       });
-      
     });
   </script>
 {% endblock %}

@@ -22,6 +22,15 @@ class ConfigItemEditView(generic.ObjectEditView):
     queryset = ConfigItem.objects.all()
     form = ConfigItemForm
 
+    def get_success_url(self):
+        if not self.object:
+            raise ValueError("self.object is None in get_success_url")
+        url = reverse('plugins:os_config_management:configitem_list', kwargs={'pk': self.object.pk})
+        if url is None:
+            raise ValueError("reverse returned None")
+        return url
+    
+
 class ConfigItemDeleteView(generic.ObjectDeleteView):
     queryset = ConfigItem.objects.all()
 
@@ -54,9 +63,10 @@ class ConfigSetListView(generic.ObjectListView):
 class ConfigSetView(generic.ObjectView):
     queryset = ConfigSet.objects.all()
 
-class ConfigSetEditView(generic.ObjectEditView):
+    
+    class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm  # Using form = as requested
+    form = ConfigSetForm
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
@@ -73,20 +83,6 @@ class ConfigSetEditView(generic.ObjectEditView):
             raise ValueError("Form instantiation returned None")
         return form_instance
 
-    def get_extra_context(self, request, instance):
-        initial_data = (
-            [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
-             for ci in instance.config_items.all()]
-            if instance else []
-        )
-        formset = ConfigItemValueFormSet(
-            request.POST if request.method == 'POST' else None,
-            initial=initial_data
-        )
-        if formset is None:
-            raise ValueError("Formset instantiation returned None")
-        return {'formset': formset}
-
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         form = self.get_form()
@@ -94,26 +90,47 @@ class ConfigSetEditView(generic.ObjectEditView):
 
         if form.is_valid() and formset.is_valid():
             obj = form.save()
+            # Replace existing config_items and values with submitted data
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
-                if not form_data.get('DELETE', False):
-                    config_item = form_data['config_item']
-                    config_items.add(config_item)
-                    values[config_item.name] = form_data['value']
+                config_item = form_data['config_item']
+                config_items.add(config_item)
+                values[config_item.name] = form_data['value']
             obj.config_items.set(config_items)
             obj.values = values
             obj.save()
             return self.form_valid(form)
-        return render(request, self.template_name, obj)    
-     
+        else:
+            # Build context manually without get_context_data()
+            context = {
+                'form': form,
+                'formset': formset,
+                'object': obj,
+            }
+            return render(request, self.template_name, context)
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        form = self.get_form()
+        initial_data = (
+            [{'config_item': ci, 'value': obj.values.get(ci.name, '')}
+             for ci in obj.config_items.all()]
+            if obj else []
+        )
+        formset = ConfigItemValueFormSet(initial=initial_data)
+        context = {
+            'form': form,
+            'formset': formset,
+            'object': obj,
+        }
+        return render(request, self.template_name, context)
+
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
-        url = reverse('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
-        if url is None:
-            raise ValueError("reverse returned None")
-        return url
+        return reverse('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
+
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()

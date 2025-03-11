@@ -117,13 +117,13 @@ class OSConfig(NetBoxModel):
         null=True,
         blank=True,
         related_name='children',
-        help_text="The parent configuration node from which this node inherits ConfigSets."
+        help_text="The parent configuration node from which this node inherits Config Sets."
     )
     config_sets = models.ManyToManyField(
         ConfigSet,
         related_name='os_configs',
         blank=True,
-        help_text="Configuration sets applied to this node, overriding inherited ConfigSets."
+        help_text="Configuration sets applied to this node, overriding inherited Config Sets."
     )
     hierarchy_type = models.CharField(
         max_length=50,
