@@ -19,9 +19,11 @@
   </div>
 
   <div class="card mt-3" id="formset-container">
+    
     <div class="card-header">
       <h3>Config Items</h3>
     </div>
+    
     <div class="card-body">
       {{ formset.management_form }}
       {% for form in formset %}
@@ -44,9 +46,11 @@
         </div>
       {% endfor %}
     </div>
+    
     <div class="card-footer">
       <button type="button" class="btn btn-primary btn-sm" onclick="addRow('formset-container')">Add Row</button>
     </div>
+    
     <!-- Hidden empty form -->
     <div class="d-none empty-form">
       <div class="row align-items-center mb-2 formset-row">
@@ -67,6 +71,7 @@
         </div>
       </div>
     </div>
+
   </div>
 {% endblock %}
 
