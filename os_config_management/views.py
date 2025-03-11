@@ -63,10 +63,9 @@ class ConfigSetListView(generic.ObjectListView):
 class ConfigSetView(generic.ObjectView):
     queryset = ConfigSet.objects.all()
 
-    
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm
+    form = ConfigSetForm  # Using form = as requested
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
@@ -109,27 +108,17 @@ class ConfigSetEditView(generic.ObjectEditView):
                 'object': obj,
             }
             return render(request, self.template_name, context)
-
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()
-        initial_data = (
-            [{'config_item': ci, 'value': obj.values.get(ci.name, '')}
-             for ci in obj.config_items.all()]
-            if obj else []
-        )
-        formset = ConfigItemValueFormSet(initial=initial_data)
-        context = {
-            'form': form,
-            'formset': formset,
-            'object': obj,
-        }
-        return render(request, self.template_name, context)
-
+     
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
-        return reverse('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
+        url = reverse('plugins:os_config_management:configset_list', kwargs={'pk': self.object.pk})
+        if url is None:
+            raise ValueError("reverse returned None")
+        return url
+    
+    
+    
 
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
