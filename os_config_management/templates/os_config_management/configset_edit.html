@@ -3,6 +3,10 @@
 {% load static %}
 {% load form_helpers %}
 
+{% block title %}
+  {% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}
+{% endblock %}
+
 {% block form %}
   <div class="card">
     <div class="card-header">
@@ -15,11 +19,9 @@
   </div>
 
   <div class="card mt-3" id="formset-container">
-    
     <div class="card-header">
       <h3>Config Items</h3>
     </div>
-    
     <div class="card-body">
       {{ formset.management_form }}
       {% for form in formset %}
@@ -42,11 +44,9 @@
         </div>
       {% endfor %}
     </div>
-    
     <div class="card-footer">
       <button type="button" class="btn btn-primary btn-sm" onclick="addRow('formset-container')">Add Row</button>
     </div>
-    
     <!-- Hidden empty form -->
     <div class="d-none empty-form">
       <div class="row align-items-center mb-2 formset-row">
@@ -63,24 +63,30 @@
           </div>
         </div>
         <div class="col-md-2">
-          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove Row</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button>
         </div>
       </div>
     </div>
-
   </div>
+{% endblock %}
 
-<script>
+{% block javascript %}
+  {{ block.super }}
+  <script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
       const totalForms = container.querySelector('input[name="form-TOTAL_FORMS"]');
-      const formIdx = totalForms.value;
+      const formIdx = parseInt(totalForms.value);
       const emptyForm = container.querySelector('.empty-form').innerHTML.replace(/__prefix__/g, formIdx);
       const cardBody = container.querySelector('.card-body');
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = emptyForm;
-      cardBody.appendChild(tempDiv);
+      tempDiv.innerHTML = emptyForm.trim();
+      const newRow = tempDiv.firstChild;
+      cardBody.appendChild(newRow);
       totalForms.value = formIdx + 1;
+
+      // Trigger NetBox's Select2 initialization on new row
+      $(newRow).find('select.form-control').select2();
     }
 
     function removeRow(button) {
@@ -91,6 +97,5 @@
         totalForms.value = parseInt(totalForms.value) - 1;
       }
     }
-
   </script>
 {% endblock %}
