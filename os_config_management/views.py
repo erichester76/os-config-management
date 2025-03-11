@@ -6,6 +6,7 @@ from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigItemFilter
 from netbox.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django import forms
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
