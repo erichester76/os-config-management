@@ -15,7 +15,7 @@
     <div class="card-body">
       {% if form %}
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form|render_form }}
       {% else %}
         <p class="text-danger">Error: Form is not available.</p>
       {% endif %}
@@ -30,7 +30,7 @@
       {% if form.config_sets %}
         <div class="form-group">
           {{ form.config_sets.label_tag }}
-          {{ form.config_sets }}
+          {{ form.config_sets|render_field }}
           {% if form.config_sets.errors %}
             <div class="invalid-feedback d-block">
               {{ form.config_sets.errors }}

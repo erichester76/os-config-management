@@ -84,8 +84,8 @@ class OSConfigForm(forms.ModelForm):
     class Meta:
         model = OSConfig
         fields = [
-            'name', 'parent', 'hierarchy_type', 'is_machine_specific',
-            'description', 'state'
+            'name', 'description', 'parent', 'hierarchy_type', 'is_machine_specific',
+            'state'
         ]
         widgets = {
             'parent': forms.Select(attrs={'class': 'form-control'}),

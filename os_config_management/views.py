@@ -149,54 +149,15 @@ class OSConfigView(generic.ObjectView):
 
 class OSConfigEditView(generic.ObjectEditView):
     queryset = OSConfig.objects.all()
-    form = OSConfigForm  # Using form = as requested
+    form = OSConfigForm 
     template_name = 'os_config_management/osconfig_edit.html'
-
-    def get_object(self, **kwargs):
-        if 'pk' in self.kwargs:
-            return super().get_object(**kwargs)
-        return None
-
-    def get_form(self, form_class=None):
-        obj = self.get_object()
-        form_instance = self.form(
-            self.request.POST if self.request.method == 'POST' else None,
-            instance=obj
-        )
-        if form_instance is None:
-            raise ValueError("Form instantiation returned None")
-        # Always add config_sets field, with initial data from the object if it exists
-        form_instance.fields['config_sets'] = forms.ModelMultipleChoiceField(
-            queryset=ConfigSet.objects.all(),
-            required=False,
-            widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
-            initial=obj.config_sets.all() if obj else None
-        )
-        return form_instance
-
-    def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()
-
-        if form.is_valid():
-            # Save the OSConfig instance first to ensure it has an ID
-            obj = form.save(commit=False)
-            obj.save()  # Save to DB, assigns ID
-            # Update config_sets after the instance is saved
-            obj.config_sets.set(form.cleaned_data['config_sets'])
-            # No additional save() needed unless other fields changed
-            return self.form_valid(form)
-        else:
-            # Re-render with errors
-            context = self.get_context_data(form=form, object=obj)
-            return render(request, self.template_name, context)
 
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
-        url = reverse('plugins:os_config_management:osconfig', kwargs={'pk': self.object.pk})
+        url = reverse('plugins:os_config_management:osconfig_list', kwargs={'pk': self.object.pk})
         if url is None:
-            raise ValueError("reverse_lazy returned None")
+            raise ValueError("reverse returned None")
         return url
     
 class OSConfigDeleteView(generic.ObjectDeleteView):
