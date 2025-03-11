@@ -82,6 +82,20 @@ class ConfigSetEditView(generic.ObjectEditView):
             raise ValueError("Form instantiation returned None")
         return form_instance
 
+    def get_extra_context(self, request, instance):
+        initial_data = (
+            [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
+             for ci in instance.config_items.all()]
+            if instance else []
+        )
+        formset = ConfigItemValueFormSet(
+            request.POST if request.method == 'POST' else None,
+            initial=initial_data
+        )
+        if formset is None:
+            raise ValueError("Formset instantiation returned None")
+        return {'formset': formset}
+
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         form = self.get_form()
@@ -107,7 +121,7 @@ class ConfigSetEditView(generic.ObjectEditView):
                 'formset': formset,
                 'object': obj,
             }
-            return render(request, self.template_name, context)
+            return render(request, self.template_name, context)  
      
     def get_success_url(self):
         if not self.object:
@@ -116,10 +130,6 @@ class ConfigSetEditView(generic.ObjectEditView):
         if url is None:
             raise ValueError("reverse returned None")
         return url
-    
-    
-    
-
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()
