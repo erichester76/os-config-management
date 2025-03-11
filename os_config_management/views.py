@@ -106,14 +106,6 @@ class ConfigSetEditView(generic.ObjectEditView):
             return self.form_valid(form)
         return self.form_invalid(form)
 
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()
-        # Leverage the parent get_context_data() from UpdateView
-        context = super().get_context_data(form=form, object=obj)
-        context.update(self.get_extra_context(request, obj))
-        return render(request, self.template_name, context)
-
     def get_success_url(self):
         if not self.object:
             raise ValueError("self.object is None in get_success_url")
