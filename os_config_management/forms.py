@@ -4,9 +4,6 @@ from utilities.forms.fields import JSONField
 from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilterSetForm
 
 class ConfigItemForm(NetBoxModelForm):
-    """
-    Form for creating and editing ConfigItem objects.
-    """
     class Meta:
         model = ConfigItem
         fields = ('name', 'type', 'description', 'required', 'tags')
@@ -83,14 +80,29 @@ class ConfigSetImportForm(NetBoxModelImportForm):
         model = ConfigSet
         fields = ('name', 'description', 'config_items', 'values', 'tags')
             
-class OSConfigForm(NetBoxModelForm):
-    """
-    Form for creating and editing OSConfig objects.
-    """
+class OSConfigForm(forms.ModelForm):
     class Meta:
         model = OSConfig
-        fields = ('name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific', 'description', 'state', 'tags')
-        
+        fields = [
+            'name', 'parent', 'hierarchy_type', 'is_machine_specific',
+            'description', 'state'
+        ]
+        widgets = {
+            'parent': forms.Select(attrs={'class': 'form-control'}),
+            'hierarchy_type': forms.Select(attrs={'class': 'form-control'}),
+            'is_machine_specific': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'state': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            # Exclude the current instance from parent choices to avoid self-referencing
+            self.fields['parent'].queryset = OSConfig.objects.exclude(pk=self.instance.pk)
+        else:
+            self.fields['parent'].queryset = OSConfig.objects.all()
+            
 class OSConfigFilterForm(NetBoxModelFilterSetForm):
     model = OSConfig
     
