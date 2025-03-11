@@ -102,8 +102,8 @@ class ConfigSetEditView(generic.ObjectEditView):
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            obj = form.save()
-            # Replace existing config_items and values with submitted data
+            if obj:  # Editing an existing ConfigSet
+                form.instance = obj  
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
