@@ -72,8 +72,7 @@ class ConfigSetEditView(generic.ObjectEditView):
         initial_data = (
             [{'config_item': ci, 'value': instance.values.get(ci.name, '')}
              for ci in instance.config_items.all()]
-            if instance else []
-        )
+        ) if instance else []
         formset = ConfigItemValueFormSet(
             request.POST if request.method == 'POST' else None,
             initial=initial_data
@@ -85,10 +84,9 @@ class ConfigSetEditView(generic.ObjectEditView):
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
         form = ConfigSetForm(request.POST)
-        
         formset = ConfigItemValueFormSet(request.POST)
 
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
