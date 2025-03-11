@@ -65,7 +65,7 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm  # Using form = as requested
+    form = ConfigSetForm  
     template_name = 'os_config_management/configset_edit.html'
 
     def get_extra_context(self, request, instance):
@@ -84,12 +84,11 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        form = self.get_form()
+        form = ConfigSetForm(request.POST)
+        
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid():
-            if obj: 
-                form.instance = obj  
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
