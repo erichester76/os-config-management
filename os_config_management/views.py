@@ -5,7 +5,7 @@ from .filters import ConfigItemFilterSet, ConfigSetFilterSet, OSConfigFilterSet
 from .forms import ConfigItemForm, ConfigSetForm, OSConfigForm, ConfigItemFilterForm, ConfigSetFilterForm, OSConfigFilterForm, ConfigItemImportForm, ConfigSetImportForm, OSConfigImportForm , ConfigItemValueFormSet
 from netbox.views import generic
 from django.urls import reverse_lazy
-
+from django.shortcuts import render
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
@@ -53,16 +53,9 @@ class ConfigSetListView(generic.ObjectListView):
 class ConfigSetView(generic.ObjectView):
     queryset = ConfigSet.objects.all()
 
-# views.py
-from netbox.views import generic
-from django.urls import reverse_lazy
-from django.shortcuts import render
-from .models import ConfigSet
-from .forms import ConfigSetForm, ConfigItemValueFormSet
-
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm  # Using form = instead of form_class =
+    form = ConfigSetForm  # Using form = as requested
     template_name = 'os_config_management/configset_edit.html'
 
     def get_object(self, **kwargs):
@@ -116,8 +109,9 @@ class ConfigSetEditView(generic.ObjectEditView):
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
         form = self.get_form()
-        extra_context = self.get_extra_context(request, obj)
-        context = self.get_context_data(form=form, object=obj, **extra_context)
+        # Leverage the parent get_context_data() from UpdateView
+        context = super().get_context_data(form=form, object=obj)
+        context.update(self.get_extra_context(request, obj))
         return render(request, self.template_name, context)
 
     def get_success_url(self):
