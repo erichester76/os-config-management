@@ -50,6 +50,7 @@
 {% endblock %}
 
 {% block javascript %}
+  {{ block.super }}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const formsetRows = document.getElementById('formset-rows');
@@ -63,21 +64,37 @@
 
       // Add new row
       addRowButton.addEventListener('click', function() {
-        const rowCount = parseInt(totalForms.value); // Use current totalForms value
+        const rowCount = parseInt(totalForms.value);
         const newRow = formsetRows.children[0].cloneNode(true);
+
+        // Update input names and IDs
         newRow.querySelectorAll('input, select').forEach(input => {
           input.name = input.name.replace(/-\d+-/, `-${rowCount}-`);
           input.id = input.id.replace(/-\d+-/, `-${rowCount}-`);
           if (input.type === 'select-one') {
-            input.selectedIndex = 0; // Reset dropdown to first option
+            // Destroy existing Select2 instance
+            $(input).select2('destroy');
+            // Reset value
+            input.selectedIndex = 0;
           } else if (input.type === 'checkbox') {
             input.checked = false;
           } else {
-            input.value = ''; // Clear text inputs
+            input.value = '';
           }
         });
+
         formsetRows.appendChild(newRow);
-        totalForms.value = rowCount + 1; // Increment total forms
+
+        // Reinitialize Select2 on the new select element
+        newRow.querySelectorAll('select.config-item-select').forEach(select => {
+          $(select).select2({
+            width: '100%', // Match NetBox styling
+            placeholder: 'Select a Config Item',
+            allowClear: true
+          });
+        });
+
+        totalForms.value = rowCount + 1;
       });
 
       // Delete row
@@ -85,8 +102,12 @@
         if (e.target.classList.contains('delete-row')) {
           const row = e.target.closest('.formset-row');
           if (formsetRows.children.length > 1) {
+            // Destroy Select2 before removing
+            row.querySelectorAll('select.config-item-select').forEach(select => {
+              $(select).select2('destroy');
+            });
             row.remove();
-            totalForms.value = parseInt(totalForms.value) - 1; // Decrement total forms
+            totalForms.value = parseInt(totalForms.value) - 1;
           }
         }
       });
@@ -96,7 +117,7 @@
         if (e.target.classList.contains('config-item-select')) {
           const row = e.target.closest('.formset-row');
           const configItemId = e.target.value;
-          if (configItemId) { // Only fetch if a value is selected
+          if (configItemId) {
             fetch(`/api/plugins/os-config/configitems/${configItemId}/`)
               .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');

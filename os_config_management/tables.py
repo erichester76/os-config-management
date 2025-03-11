@@ -28,7 +28,7 @@ class ConfigSetTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = ConfigSet
         fields = ('pk', 'id', 'name', 'description', 'config_items', 'values', 'created', 'last_updated')
-        default_columns = ('name', 'description', 'config_items', 'values')
+        default_columns = ('name', 'description', 'values', 'last_updated')
 
 class OSConfigTable(NetBoxTable):
     """
@@ -45,4 +45,4 @@ class OSConfigTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = OSConfig
         fields = ('pk', 'id', 'name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific', 'description', 'state', 'created', 'last_updated')
-        default_columns = ('name', 'parent', 'config_sets', 'hierarchy_type', 'is_machine_specific')
+        default_columns = ('name', 'parent', 'config_sets', 'hierarchy_type', 'last_updated')
