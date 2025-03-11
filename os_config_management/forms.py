@@ -20,7 +20,12 @@ class ConfigItemImportForm(NetBoxModelImportForm):
 class ConfigSetForm(forms.ModelForm):
     class Meta:
         model = ConfigSet
-        fields = ['name', 'description']
+        fields = ['id', 'name', 'description']  
+        widgets = {
+            'id': forms.HiddenInput(),  
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
 class ConfigItemValueForm(forms.Form):
     config_item = forms.ModelChoiceField(
