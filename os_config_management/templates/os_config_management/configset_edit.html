@@ -71,8 +71,9 @@
 {% endblock %}
 
 {% block javascript %}
-{{ block.super }}
-  <script>
+ <script src="{% static 'netbox/js/jquery.min.js' %}"></script>
+ <script src="{% static 'netbox/js/select2.min.js' %}"></script>
+ <script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
       const totalForms = container.querySelector('input[name="form-TOTAL_FORMS"]');
