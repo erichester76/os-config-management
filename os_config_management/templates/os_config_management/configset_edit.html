@@ -4,7 +4,7 @@
 {% load form_helpers %}
 
 {% block title %}
-  {% if object %}Edit ConfigSet: {{ object.name }}{% else %}Create New ConfigSet{% endif %}
+  {% if object %}Edit: {{ object.name }}{% else %}Create:{% endif %}
 {% endblock %}
 
 {% block form %}
@@ -71,8 +71,6 @@
 {% endblock %}
 
 {% block javascript %}
- <script src="{% static 'js/jquery.min.js' %}"></script>
- <script src="{% static 'js/select2.min.js' %}"></script>
  <script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
@@ -85,7 +83,7 @@
       const newRow = tempDiv.firstChild;
       cardBody.appendChild(newRow);
       totalForms.value = formIdx + 1;
-      $(newRow).find('select.form-control').select2();
+      newRow.querySelector('select.form-control').select2();
     }
 
     function removeRow(button) {
