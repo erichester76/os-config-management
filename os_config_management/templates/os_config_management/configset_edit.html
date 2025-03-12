@@ -103,7 +103,7 @@
 
       window.addRow = function() {
         const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+        const emptyFormTemplate = document.getElementById('empty-form-template').cloneNode(true).innerHTML;
         const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, totalForms);
         
         const tempDiv = document.createElement('div');
