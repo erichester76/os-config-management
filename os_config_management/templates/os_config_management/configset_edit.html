@@ -83,7 +83,7 @@
       const newRow = tempDiv.firstChild;
       cardBody.appendChild(newRow);
       totalForms.value = formIdx + 1;
-      select = newRow.querySelector('select');
+      select = newRow.querySelector('div.form-control')
       select.select2()
     }
 
