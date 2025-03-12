@@ -26,7 +26,7 @@
       {{ formset.management_form }}
       <div id="formset-rows">
         {% for form in formset %}
-          <div class="row align-items-center mb-2 formset-row">
+          <div class="row align-items-center mb-2 formset-row" id="form-row-{{ forloop.counter0 }}">
             <div class="col-md-5">
               <div class="form-group">
                 <label for="{{ form.config_item.id_for_label }}">Config Item</label>
@@ -39,20 +39,13 @@
                 {{ form.value }}
               </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
               <div class="form-check">
-                {{ form.DELETE }} <!-- Renders as a checkbox -->
+                {{ form.DELETE }}
                 <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Delete</label>
+                <button type="button" class="btn btn-danger btn-sm ml-2" onclick="removeRow('form-row-{{ forloop.counter0 }}')">Remove</button>
               </div>
             </div>
-            {% if formset.can_order %}
-              <div class="col-md-1">
-                <div class="form-group">
-                  <label for="{{ form.ORDER.id_for_label }}">Order</label>
-                  {{ form.ORDER }}
-                </div>
-              </div>
-            {% endif %}
           </div>
         {% endfor %}
       </div>
@@ -62,7 +55,7 @@
     </div>
     <!-- Hidden empty form template -->
     <div class="d-none" id="empty-form-template">
-      <div class="row align-items-center mb-2 formset-row">
+      <div class="row align-items-center mb-2 formset-row" id="form-row-__prefix__">
         <div class="col-md-5">
           <div class="form-group">
             <label for="{{ formset.empty_form.config_item.id_for_label }}">Config Item</label>
@@ -75,20 +68,13 @@
             {{ formset.empty_form.value }}
           </div>
         </div>
-        <div class="col-md-1">
+        <div class="col-md-2">
           <div class="form-check">
             {{ formset.empty_form.DELETE }}
             <label class="form-check-label" for="{{ formset.empty_form.DELETE.id_for_label }}">Delete</label>
+            <button type="button" class="btn btn-danger btn-sm ml-2" onclick="removeRow('form-row-__prefix__')">Remove</button>
           </div>
         </div>
-        {% if formset.can_order %}
-          <div class="col-md-1">
-            <div class="form-group">
-              <label for="{{ formset.empty_form.ORDER.id_for_label }}">Order</label>
-              {{ formset.empty_form.ORDER }}
-            </div>
-          </div>
-        {% endif %}
       </div>
     </div>
   </div>
@@ -100,12 +86,14 @@
     document.addEventListener('DOMContentLoaded', function() {
       const formsetRows = document.getElementById('formset-rows');
       const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+      const initialFormsInput = document.getElementById('id_form-INITIAL_FORMS');
 
       window.addRow = function() {
         const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = document.getElementById('empty-form-template').cloneNode(true).innerHTML;
-        const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, totalForms);
-        
+        const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+        const newFormId = 'form-row-' + totalForms;
+        const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, totalForms).replace('form-row-__prefix__', newFormId);
+
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = newFormHtml.trim();
         const newRow = tempDiv.firstChild;
@@ -117,25 +105,29 @@
           } else if (input.type === 'checkbox') {
             input.checked = false; // Uncheck DELETE checkbox
           } else {
-            input.value = ''; // Clear text inputs, including ORDER if present
+            input.value = ''; // Clear text inputs
           }
         });
+
+        // Update the remove button's onclick attribute
+        const removeButton = newRow.querySelector('.btn-danger');
+        removeButton.setAttribute('onclick', `removeRow('${newFormId}')`);
 
         formsetRows.appendChild(newRow);
         totalFormsInput.value = totalForms + 1;
       };
 
-      window.removeRow = function(button) {
-        const row = button.closest('.formset-row');
-        if (row && formsetRows.children.length > 1) { // Keep at least one row
+      window.removeRow = function(rowId) {
+        const row = document.getElementById(rowId);
+        if (row && formsetRows.children.length > parseInt(initialFormsInput.value)) { // Respect initial forms
           const deleteCheckbox = row.querySelector('input[name$="-DELETE"]');
-          if (deleteCheckbox) {
-            deleteCheckbox.checked = true; // Mark for deletion
+          if (deleteCheckbox && rowId.startsWith('form-row-') && parseInt(rowId.split('-')[2]) < parseInt(initialFormsInput.value)) {
+            deleteCheckbox.checked = true; // Mark existing forms for deletion
             row.style.display = 'none'; // Hide instead of remove
           } else {
-            row.remove(); // Remove if no DELETE field (new row)
+            row.remove(); // Remove new forms entirely
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
           }
-          totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
         }
       };
     });
