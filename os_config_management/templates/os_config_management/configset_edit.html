@@ -71,7 +71,7 @@
 {% endblock %}
 
 {% block javascript %}
-  {{ block.super }}
+{{ block.super }}
   <script>
     function addRow(containerId) {
       const container = document.getElementById(containerId);
@@ -84,8 +84,6 @@
       const newRow = tempDiv.firstChild;
       cardBody.appendChild(newRow);
       totalForms.value = formIdx + 1;
-
-      // Trigger NetBox's Select2 initialization on new row
       $(newRow).find('select.form-control').select2();
     }
 
