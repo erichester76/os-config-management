@@ -83,7 +83,8 @@
       const newRow = tempDiv.firstChild;
       cardBody.appendChild(newRow);
       totalForms.value = formIdx + 1;
-      newRow.querySelector('select.form-control').select2();
+      select = newRow.querySelector('select.form-control')
+      select.destroy().select2()
     }
 
     function removeRow(button) {
