@@ -70,7 +70,7 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def get_extra_context(self, request, instance):
         initial_data = []
-        if instance and instance.config_items is not None: 
+        if instance and instance.values is not None: 
             initial_data = ([{'config_item': ci, 'value': instance.values.get(ci.name, '')} for ci in instance.config_items.all()]) 
             
         formset = ConfigItemValueFormSet(
