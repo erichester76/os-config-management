@@ -84,20 +84,27 @@ class ConfigSetEditView(generic.ObjectEditView):
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        form = ConfigSetForm(request.POST)
+        form = ConfigSetForm(request.POST, instance=obj)  # Pass instance to form
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
+            # Save the ConfigSet form first to ensure obj has an ID
+            obj = form.save()  # Creates new or updates existing obj
+
+            # Process formset data
             config_items = set()
             values = {}
-            config_item = []
             for form_data in formset.cleaned_data:
-                config_item.id = form_data['config_item']
-                config_items.add(config_item)
-                values[config_item.name] = form_data['value']
+                if not form_data.get('DELETE', False):  # Skip deleted forms
+                    config_item = form_data['config_item']  # This is a ConfigItem instance
+                    config_items.add(config_item)
+                    values[config_item.name] = form_data['value']
+
+            # Set ManyToMany relationship with ConfigItem instances
             obj.config_items.set(config_items)
             obj.values = values
-            obj.save()
+            obj.save()  # Save any additional changes (e.g., values)
+
             return self.form_valid(form)
         else:
             context = {
@@ -105,7 +112,7 @@ class ConfigSetEditView(generic.ObjectEditView):
                 'formset': formset,
                 'object': obj,
             }
-            return render(request, self.template_name, context)  
+            return render(request, self.template_name, context)
      
     def get_success_url(self):
         url = reverse('plugins:os_config_management:configset_list', kwargs={'pk': self.object.pk})
