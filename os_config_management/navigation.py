@@ -37,7 +37,7 @@ items = (
     ),
     PluginMenuItem(
         link='plugins:os_config_management:osconfig_list',
-        link_text='OS Configurations',
+        link_text='Configurations',
         permissions=['netbox_os_config.view_osconfig'],
         buttons=(
             PluginMenuButton(
@@ -55,7 +55,7 @@ items = (
 )
 
 menu = PluginMenu(
-    label='OS Config Management',
+    label='Config Management',
     icon_class='mdi mdi-harddisk',
-    groups=(('OS Configuration', items),)
+    groups=(('Configurations', items),)
 )

@@ -153,8 +153,8 @@ class OSConfig(NetBoxModel):
 
     class Meta:
         ordering = ['name']
-        verbose_name = "OS Configuration"
-        verbose_name_plural = "OS Configurations"
+        verbose_name = "Configuration"
+        verbose_name_plural = "Configurations"
 
     def __str__(self):
         return f"{self.name} (Parent: {self.parent.name if self.parent else 'None'}, Type: {self.hierarchy_type})"
