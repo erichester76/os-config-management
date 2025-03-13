@@ -6,6 +6,7 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
+      <!-- OSConfig Details Card -->
       <div class="card">
         <div class="card-header">
           <h3>{{ object.name }}</h3>
@@ -57,6 +58,43 @@
               </td>
             </tr>
           </table>
+        </div>
+      </div>
+
+      <!-- Inherited Config Items Card -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h3>Inherited Config Items</h3>
+        </div>
+        <div class="card-body">
+          {% if config_items_with_origin %}
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Config Item</th>
+                  <th>Value</th>
+                  <th>Origin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in config_items_with_origin %}
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>
+                      {% if item.value|is_list %}
+                        {{ item.value|join:", " }}
+                      {% else %}
+                        {{ item.value }}
+                      {% endif %}
+                    </td>
+                    <td>{{ item.origin }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="text-muted">No inherited config items found.</p>
+          {% endif %}
         </div>
       </div>
     </div>

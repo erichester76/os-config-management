@@ -146,10 +146,48 @@ class OSConfigListView(generic.ObjectListView):
     table = OSConfigTable
     filterset = OSConfigFilterSet
     filterset_form = OSConfigFilterForm
+# views.py
+from netbox.views import generic
+from .models import OSConfig
 
 class OSConfigView(generic.ObjectView):
     queryset = OSConfig.objects.all()
+    template_name = 'os_config_management/osconfig.html'
 
+    def get_extra_context(self, request, instance):
+        # Get the final inherited config with overrides
+        inherited_config = instance.get_inherited_config()
+
+        # Build a list of nodes from top (root) to bottom (current)
+        nodes = []
+        current_node = instance
+        while current_node:
+            nodes.append(current_node)
+            current_node = current_node.parent
+        nodes.reverse()  # Now top-down: root to current
+
+        # Track config items and their origins
+        config_items_with_origin = []
+        config_sources = {}  # Track where each key was last set
+
+        # Iterate top-down to respect overrides
+        for node in nodes:
+            for config_set in node.config_sets.all():
+                for key, value in config_set.values.items():
+                    config_sources[key] = f"{node.name} ({config_set.name})"
+        
+        # Build table data from final config with origins
+        for key, value in inherited_config.items():
+            config_items_with_origin.append({
+                'name': key,
+                'value': value,
+                'origin': config_sources.get(key, "Unknown")
+            })
+
+        return {
+            'config_items_with_origin': config_items_with_origin
+        }
+        
 class OSConfigEditView(generic.ObjectEditView):
     queryset = OSConfig.objects.all()
     form = OSConfigForm 
