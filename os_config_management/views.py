@@ -65,49 +65,38 @@ class ConfigSetView(generic.ObjectView):
 
 class ConfigSetEditView(generic.ObjectEditView):
     queryset = ConfigSet.objects.all()
-    form = ConfigSetForm
+    form = ConfigSetForm  
     template_name = 'os_config_management/configset_edit.html'
 
-    def get_object(self, **kwargs):
-        if 'pk' in self.kwargs:
-            return super().get_object(**kwargs)
-        return None
-
-    def get_form(self, form_class=None):
-        obj = self.get_object()
-        form_instance = self.form(
-            self.request.POST if self.request.method == 'POST' else None,
-            instance=obj
+    def get_extra_context(self, request, instance):
+        initial_data = []
+        if instance and len(instance.values) > 0 and request.method == 'GET': 
+            initial_data = ([{'config_item': ci, 'value': instance.values.get(ci.name, '')} for ci in instance.config_items.all()]) 
+            
+        formset = ConfigItemValueFormSet(
+            request.POST if request.method == 'POST' else None,
+            initial=initial_data
         )
-        if form_instance is None:
-            raise ValueError("Form instantiation returned None")
-        return form_instance
+        
+        if formset is None:
+            raise ValueError("Formset instantiation returned None")
+        return {'formset': formset}
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
-        form = self.get_form()  # Uses instance from get_object()
+        form = ConfigSetForm(request.POST)
         formset = ConfigItemValueFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            # Save the ConfigSet instance first to ensure it has an ID
-            if obj:  # Editing an existing instance
-                form.instance = obj  # Ensure form updates the existing obj
-            obj = form.save()  # Creates or updates obj, assigns ID
-
-            # Process formset data
             config_items = set()
             values = {}
             for form_data in formset.cleaned_data:
-                if not form_data.get('DELETE', False):  # Skip deleted forms
-                    config_item = form_data['config_item']
-                    config_items.add(config_item)
-                    values[config_item.name] = form_data['value']
-
-            # Now safe to set ManyToMany relationship
+                config_item = form_data['config_item']
+                config_items.add(config_item)
+                values[config_item.name] = form_data['value']
             obj.config_items.set(config_items)
             obj.values = values
-            obj.save()  # Save any additional changes (e.g., values)
-
+            obj.save()
             return self.form_valid(form)
         else:
             context = {
@@ -115,28 +104,11 @@ class ConfigSetEditView(generic.ObjectEditView):
                 'formset': formset,
                 'object': obj,
             }
-            return render(request, self.template_name, context)
-
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()
-        initial_data = (
-            [{'config_item': ci, 'value': obj.values.get(ci.name, '')}
-             for ci in obj.config_items.all()]
-            if obj else []
-        )
-        formset = ConfigItemValueFormSet(initial=initial_data)
-        context = {
-            'form': form,
-            'formset': formset,
-            'object': obj,
-        }
-        return render(request, self.template_name, context)
-
+            return render(request, self.template_name, context)  
+     
     def get_success_url(self):
-        if not self.object:
-            raise ValueError("self.object is None in get_success_url")
-        return reverse('plugins:os_config_management:configset', kwargs={'pk': self.object.pk})
+        url = reverse('plugins:os_config_management:configset_list', kwargs={'pk': self.object.pk})
+        return url
     
 class ConfigSetDeleteView(generic.ObjectDeleteView):
     queryset = ConfigSet.objects.all()
