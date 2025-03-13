@@ -81,7 +81,7 @@
                   <tr>
                     <td>{{ item.name }}</td>
                     <td>
-                      {% if item.value|is_list %}
+                      {% if item.value %}
                         {{ item.value|join:", " }}
                       {% else %}
                         {{ item.value }}

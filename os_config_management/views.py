@@ -146,9 +146,7 @@ class OSConfigListView(generic.ObjectListView):
     table = OSConfigTable
     filterset = OSConfigFilterSet
     filterset_form = OSConfigFilterForm
-# views.py
-from netbox.views import generic
-from .models import OSConfig
+
 
 class OSConfigView(generic.ObjectView):
     queryset = OSConfig.objects.all()
