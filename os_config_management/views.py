@@ -105,7 +105,7 @@ class ConfigSetEditView(generic.ObjectEditView):
             obj.values = values
             obj.save()  # Save any additional changes (e.g., values)
 
-            return self.form_valid(form)
+            return super().form_valid(form)
         else:
             context = {
                 'form': form,
