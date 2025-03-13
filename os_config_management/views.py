@@ -173,14 +173,17 @@ class OSConfigView(generic.ObjectView):
             for config_set in node.config_sets.all():
                 for key, value in config_set.values.items():
                     config_sources[key] = f"{node.name} ({config_set.name})"
-        
-        # Build table data from final config with origins
+
         for key, value in inherited_config.items():
+            display_value = ', '.join(value) if isinstance(value, (list, tuple)) else value
             config_items_with_origin.append({
                 'name': key,
-                'value': value,
+                'value': display_value,
                 'origin': config_sources.get(key, "Unknown")
             })
+
+        # Sort by name (key) A-Z
+        config_items_with_origin.sort(key=lambda x: x['name'].lower())  # Case-insensitive sort
 
         return {
             'config_items_with_origin': config_items_with_origin

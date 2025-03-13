@@ -80,13 +80,7 @@
                 {% for item in config_items_with_origin %}
                   <tr>
                     <td>{{ item.name }}</td>
-                    <td>
-                      {% if item.value %}
-                        {{ item.value|join:", " }}
-                      {% else %}
-                        {{ item.value }}
-                      {% endif %}
-                    </td>
+                    <td>{{ item.value }}</td>
                     <td>{{ item.origin }}</td>
                   </tr>
                 {% endfor %}
