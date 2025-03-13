@@ -90,8 +90,9 @@ class ConfigSetEditView(generic.ObjectEditView):
         if form.is_valid() and formset.is_valid():
             config_items = set()
             values = {}
+            config_item = []
             for form_data in formset.cleaned_data:
-                config_item = form_data['config_item']
+                config_item.id = form_data['config_item']
                 config_items.add(config_item)
                 values[config_item.name] = form_data['value']
             obj.config_items.set(config_items)
