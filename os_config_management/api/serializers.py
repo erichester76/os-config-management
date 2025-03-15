@@ -1,17 +1,12 @@
 from netbox.api.serializers import NetBoxModelSerializer
-from ..models import ConfigItem, ConfigSet, OSConfig
+from ..models import ConfigItem, Configuration
 
 class ConfigItemSerializer(NetBoxModelSerializer):
     class Meta:
         model = ConfigItem
-        fields = "__all__"
-        
-class ConfigSetSerializer(NetBoxModelSerializer):
-    class Meta:
-        model = ConfigSet
-        fields = "__all__"
+        fields = '__all__'
 
-class OSConfigSerializer(NetBoxModelSerializer):
+class ConfigurationSerializer(NetBoxModelSerializer):
     class Meta:
-        model = OSConfig
-        fields = "__all__"
+        model = Configuration
+        fields = '__all__'

@@ -1,59 +1,19 @@
-from netbox.filtersets import NetBoxModelFilterSet
-from .models import ConfigItem, ConfigSet, OSConfig
-from django.db.models import Q
+import django_filters
+from .models import ConfigItem, Configuration
 
-class ConfigItemFilterSet(NetBoxModelFilterSet):
-    """
-    Filter set for ConfigItem objects.
-    """
+class ConfigItemFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    type = django_filters.ChoiceFilter(choices=ConfigItem._meta.get_field('type').choices)
+
     class Meta:
         model = ConfigItem
-        fields = {
-            'name': ['exact', 'icontains'],
-            'type': ['exact'],
-            'required': ['exact'],
-        }
+        fields = ['name', 'type']
 
-    def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(name__icontains=value) |
-            Q(description__icontains=value)
-        )
+class ConfigurationFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    status = django_filters.ChoiceFilter(choices=Configuration._meta.get_field('status').choices)
+    is_final = django_filters.BooleanFilter()
 
-class ConfigSetFilterSet(NetBoxModelFilterSet):
-    """
-    Filter set for ConfigSet objects.
-    """
     class Meta:
-        model = ConfigSet
-        fields = {
-            'name': ['exact', 'icontains'],
-            'config_items': ['exact'],
-        }
-
-    def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(name__icontains=value) |
-            Q(description__icontains=value)
-        )
-
-class OSConfigFilterSet(NetBoxModelFilterSet):
-    """
-    Filter set for OSConfig objects.
-    """
-    class Meta:
-        model = OSConfig
-        fields = {
-            'name': ['exact', 'icontains'],
-            'parent': ['exact'],
-            'config_sets': ['exact'],
-            'hierarchy_type': ['exact'],
-            'is_machine_specific': ['exact'],
-            'state': ['exact'],
-        }
-
-    def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(name__icontains=value) |
-            Q(description__icontains=value)
-        )
+        model = Configuration
+        fields = ['name', 'status', 'is_final']

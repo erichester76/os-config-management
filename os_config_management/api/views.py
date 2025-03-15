@@ -1,15 +1,11 @@
 from netbox.api.viewsets import NetBoxModelViewSet
-from ..models import ConfigItem, ConfigSet, OSConfig
-from .serializers import ConfigItemSerializer, ConfigSetSerializer, OSConfigSerializer
+from ..models import ConfigItem, Configuration
+from .serializers import ConfigItemSerializer, ConfigurationSerializer
 
 class ConfigItemViewSet(NetBoxModelViewSet):
     queryset = ConfigItem.objects.all()
     serializer_class = ConfigItemSerializer
 
-class ConfigSetViewSet(NetBoxModelViewSet):
-    queryset = ConfigSet.objects.all()
-    serializer_class = ConfigSetSerializer
-
-class OSConfigViewSet(NetBoxModelViewSet):
-    queryset = OSConfig.objects.all()
-    serializer_class = OSConfigSerializer
+class ConfigurationViewSet(NetBoxModelViewSet):
+    queryset = Configuration.objects.all()
+    serializer_class = ConfigurationSerializer

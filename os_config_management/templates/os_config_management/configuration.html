@@ -1,4 +1,3 @@
-<!-- templates/os_config_management/osconfig.html -->
 {% extends 'generic/object.html' %}
 {% load static %}
 {% load helpers %}
@@ -6,7 +5,6 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
-      <!-- OSConfig Details Card -->
       <div class="card">
         <div class="card-header">
           <h3>{{ object.name }}</h3>
@@ -14,54 +12,20 @@
         <div class="card-body">
           <table class="table table-hover attr-table">
             <tr>
-              <th scope="row">Parent</th>
-              <td>{{ object.parent|default:"None" }}</td>
+              <th scope="row">Status</th>
+              <td>{{ object.status }}</td>
             </tr>
             <tr>
-              <th scope="row">Config Sets</th>
-              <td>{{ object.config_sets.all|join:", "|default:"None" }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Hierarchy Type</th>
-              <td>{{ object.hierarchy_type }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Is Machine Specific</th>
-              <td>{{ object.is_machine_specific|yesno }}</td>
+              <th scope="row">Is Final</th>
+              <td>{{ object.is_final }}</td>
             </tr>
             <tr>
               <th scope="row">Description</th>
               <td>{{ object.description|default:"None" }}</td>
             </tr>
-            <tr>
-              <th scope="row">State</th>
-              <td>{{ object.state }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Created</th>
-              <td>{{ object.created|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Last Updated</th>
-              <td>{{ object.last_updated|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Tags</th>
-              <td>
-                {% if object.tags.all %}
-                  {% for tag in object.tags.all %}
-                    <span class="badge badge-primary">{{ tag.name }}</span>
-                  {% endfor %}
-                {% else %}
-                  None
-                {% endif %}
-              </td>
-            </tr>
           </table>
         </div>
       </div>
-
-      <!-- Inherited Config Items Card -->
       <div class="card mt-3">
         <div class="card-header">
           <h3>Inherited Config Items</h3>
