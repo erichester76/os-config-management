@@ -20,16 +20,16 @@ class ConfigItemDetailView(generic.ObjectView):
 class ConfigItemChangelogView(generic.ObjectChangeLogView):
     queryset = ConfigItem.objects.all()
 
-class ConfigItemBulkEditView(generic.ObjectBulkEditView):
+class ConfigItemBulkEditView(generic.BulkEditView):
     queryset = ConfigItem.objects.all()
     table = ConfigItemTable
     form = ConfigItemBulkEditForm  
 
-class ConfigItemBulkDeleteView(generic.ObjectBulkDeleteView):
+class ConfigItemBulkDeleteView(generic.BulkDeleteView):
     queryset = ConfigItem.objects.all()
     table = ConfigItemTable
 
-class ConfigItemImportView(generic.ObjectImportView):
+class ConfigItemImportView(generic.BulkImportView):
     model = ConfigItem
     form = ConfigItemImportForm  
 
@@ -61,16 +61,16 @@ class ConfigurationDetailView(generic.ObjectView):
 class ConfigurationChangelogView(generic.ObjectChangeLogView):
     queryset = Configuration.objects.all()
 
-class ConfigurationBulkEditView(generic.ObjectBulkEditView):
+class ConfigurationBulkEditView(generic.BulkEditView):
     queryset = Configuration.objects.all()
     table = ConfigurationTable
     form = ConfigurationBulkEditForm  
 
-class ConfigurationBulkDeleteView(generic.ObjectBulkDeleteView):
+class ConfigurationBulkDeleteView(generic.BulkDeleteView):
     queryset = Configuration.objects.all()
     table = ConfigurationTable
 
-class ConfigurationImportView(generic.ObjectImportView):
+class ConfigurationImportView(generic.BulkImportView):
     model = Configuration
     form = ConfigurationImportForm 
 
