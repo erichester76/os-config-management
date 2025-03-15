@@ -4,7 +4,7 @@ from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilt
 class ConfigItemImportForm(NetBoxModelImportForm):
     class Meta:
         model = ConfigItem
-        fields = ('name', 'type', 'description', 'required')
+        fields = ('name', 'type', 'default_value', 'description' )
         
 class ConfigItemForm(NetBoxModelForm):
     class Meta:
