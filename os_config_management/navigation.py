@@ -7,18 +7,11 @@ items = (
         permissions=['os_config_management.view_configitem'],
         buttons=(
             PluginMenuButton(
-                link='plugins:os_config_management:configitem_bulk_edit',
-                title='Bulk Edit',
+                link='plugins:os_config_management:configitem_add',
+                title='Add',
                 icon_class='mdi mdi-edit',
                 color='blue',
-                permissions=['os_config_management.change_configitem']
-            ),
-            PluginMenuButton(
-                link='plugins:os_config_management:configitem_bulk_delete',
-                title='Bulk Delete',
-                icon_class='mdi mdi-trash',
-                color='red',
-                permissions=['os_config_management.delete_configitem']
+                permissions=['os_config_management.add_configitem']
             ),
             PluginMenuButton(
                 link='plugins:os_config_management:configitem_import',
@@ -35,24 +28,15 @@ items = (
         permissions=['os_config_management.view_configuration'],
         buttons=(
             PluginMenuButton(
-                link='plugins:os_config_management:configuration_bulk_edit',
-                title='Bulk Edit',
+                link='plugins:os_config_management:configuration_add',
+                title='Add',
                 icon_class='mdi mdi-edit',
-                color='blue',
-                permissions=['os_config_management.change_configuration']
-            ),
-            PluginMenuButton(
-                link='plugins:os_config_management:configuration_bulk_delete',
-                title='Bulk Delete',
-                icon_class='mdi mdi-trash',
-                color='red',
-                permissions=['os_config_management.delete_configuration']
+                permissions=['os_config_management.add_configuration']
             ),
             PluginMenuButton(
                 link='plugins:os_config_management:configuration_import',
                 title='Import',
                 icon_class='mdi mdi-upload',
-                color='green',
                 permissions=['os_config_management.add_configuration']
             ),
         )
