@@ -1,9 +1,8 @@
 from rest_framework import routers
-from .views import ConfigItemViewSet, ConfigSetViewSet, OSConfigViewSet
+from .views import ConfigItemViewSet, ConfigurationViewSet
 
 router = routers.DefaultRouter()
 router.register('config-items', ConfigItemViewSet)
-router.register('config-sets', ConfigSetViewSet)
-router.register('os-configs', OSConfigViewSet)
+router.register('configurations', ConfigurationViewSet)
 
 urlpatterns = router.urls
