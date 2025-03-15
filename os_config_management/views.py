@@ -17,7 +17,7 @@ class ConfigItemEditView(generic.ObjectEditView):
 class ConfigItemDetailView(generic.ObjectView):
     queryset = ConfigItem.objects.all()
 
-class ConfigItemChangelogView(generic.ObjectChangelogView):
+class ConfigItemChangelogView(generic.ObjectChangeLogView):
     queryset = ConfigItem.objects.all()
 
 class ConfigItemBulkEditView(generic.ObjectBulkEditView):
@@ -58,7 +58,7 @@ class ConfigurationDetailView(generic.ObjectView):
             })
         return {'config_items_with_origin': config_items_with_origin}
 
-class ConfigurationChangelogView(generic.ObjectChangelogView):
+class ConfigurationChangelogView(generic.ObjectChangeLogView):
     queryset = Configuration.objects.all()
 
 class ConfigurationBulkEditView(generic.ObjectBulkEditView):
