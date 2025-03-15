@@ -1,7 +1,8 @@
-import django_tables2 as tables
 from .models import ConfigItem, Configuration
+from netbox.tables import NetBoxTable
+from django_tables2 import tables
 
-class ConfigItemTable(tables.Table):
+class ConfigItemTable(NetBoxTable):
     name = tables.Column(linkify=True)
     type = tables.Column()
     default_value = tables.Column()
@@ -10,7 +11,7 @@ class ConfigItemTable(tables.Table):
         model = ConfigItem
         fields = ('name', 'type', 'default_value', 'description')
 
-class ConfigurationTable(tables.Table):
+class ConfigurationTable(NetBoxTable):
     name = tables.Column(linkify=True)
     status = tables.Column()
     is_final = tables.Column()
