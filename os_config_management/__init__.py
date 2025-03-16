@@ -7,7 +7,7 @@ class OSMgmtConfig(PluginConfig):
     version = '0.1.0'
     author = 'Eric Hester'
     author_email = 'hester1@clemson.edu'
-    base_url = 'os-config'
+    base_url = 'config_management'
     min_version = '4.1.0'
     max_version = '4.2.99'
 

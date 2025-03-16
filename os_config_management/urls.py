@@ -1,8 +1,6 @@
 from django.urls import path
 from . import views
 
-app_name = 'os_config_management'
-
 urlpatterns = [
     # ConfigItem URLs
     path('configitems/', views.ConfigItemListView.as_view(), name='configitem_list'),

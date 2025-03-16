@@ -9,15 +9,13 @@ items = (
             PluginMenuButton(
                 link='plugins:os_config_management:configitem_add',
                 title='Add',
-                icon_class='mdi mdi-edit',
-                color='blue',
+                icon_class='mdi mdi-plus-thick',
                 permissions=['os_config_management.add_configitem']
             ),
             PluginMenuButton(
                 link='plugins:os_config_management:configitem_import',
                 title='Import',
                 icon_class='mdi mdi-upload',
-                color='green',
                 permissions=['os_config_management.add_configitem']
             ),
         )
@@ -30,7 +28,7 @@ items = (
             PluginMenuButton(
                 link='plugins:os_config_management:configuration_add',
                 title='Add',
-                icon_class='mdi mdi-edit',
+                icon_class='mdi mdi-plus-thick',
                 permissions=['os_config_management.add_configuration']
             ),
             PluginMenuButton(
