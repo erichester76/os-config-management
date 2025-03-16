@@ -49,6 +49,7 @@ class ConfigurationListView(generic.ObjectListView):
 class ConfigurationEditView(generic.ObjectEditView):
     queryset = Configuration.objects.all()
     form = ConfigurationForm
+    template_name = 'os_config_management/configuration_edit.html'
 
     def get_extra_context(self, request, instance):
         assignment_formset = ConfigItemAssignmentFormSet(instance=instance)
