@@ -48,7 +48,6 @@ class ConfigurationListView(generic.ObjectListView):
     
 class ConfigurationEditView(generic.ObjectEditView):
     queryset = Configuration.objects.all()
-    model = Configuration
     form = ConfigurationForm
     template_name = 'os_config_management/configuration_edit.html'
 
@@ -92,7 +91,7 @@ class ConfigurationEditView(generic.ObjectEditView):
             return self.form_invalid(form)
 
     def get_success_url(self):
-        return reverse('plugins:os_configuration_management:configuration_detail', kwargs={'pk': self.object.pk})
+        return reverse('plugins:os_configuration_management:configuration', kwargs={'pk': self.object.pk})
     
 class ConfigurationDeleteView(generic.ObjectDeleteView):
     queryset = Configuration.objects.all()

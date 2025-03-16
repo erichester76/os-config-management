@@ -19,7 +19,6 @@ class ConfigurationInclusionForm(forms.ModelForm):
         fields = ['included_configuration', 'order']
         widgets = {'order': forms.HiddenInput()}
 
-
 ConfigurationInclusionFormSet = inlineformset_factory(
     Configuration,
     ConfigurationInclusion,
