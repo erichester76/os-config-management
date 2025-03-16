@@ -2,6 +2,7 @@ from django.db import models
 from netbox.models import NetBoxModel
 from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
+from django.urls import reverse
 
 class ConfigItem(NetBoxModel):
     name = models.CharField(max_length=100, unique=True)
@@ -24,6 +25,9 @@ class ConfigItem(NetBoxModel):
                 raise ValidationError("Default value must be a list.")
             elif self.type == 'boolean' and not isinstance(self.default_value, bool):
                 raise ValidationError("Default value must be a boolean.")
+            
+    def get_absolute_url(self):
+        return reverse('plugins:os_config_management:configitem', args=[self.pk])
 
 class ConfigurationInclusion(models.Model):
     parent_configuration = models.ForeignKey('Configuration', on_delete=models.CASCADE, related_name='inclusions')
@@ -75,7 +79,9 @@ class Configuration(NetBoxModel):
                 raise ValidationError(f"Value for '{key}' must be a list.")
             elif config_item.type == 'boolean' and not isinstance(value, bool):
                 raise ValidationError(f"Value for '{key}' must be a boolean.")
-
+    def get_absolute_url(self):
+        return reverse('plugins:os_config_management:configuration', args=[self.pk])
+    
     @cached_property
     def inherited_config(self):
         """Compute the inherited configuration with caching."""

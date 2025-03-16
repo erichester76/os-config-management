@@ -1,7 +1,8 @@
-import django_filters
 from .models import ConfigItem, Configuration
+from netbox.filtersets import NetBoxFilterSet
+import django_filters
 
-class ConfigItemFilter(django_filters.FilterSet):
+class ConfigItemFilter(NetBoxFilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     type = django_filters.ChoiceFilter(choices=ConfigItem._meta.get_field('type').choices)
 
@@ -9,7 +10,7 @@ class ConfigItemFilter(django_filters.FilterSet):
         model = ConfigItem
         fields = ['name', 'type']
 
-class ConfigurationFilter(django_filters.FilterSet):
+class ConfigurationFilter(NetBoxFilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     status = django_filters.ChoiceFilter(choices=Configuration._meta.get_field('status').choices)
     is_final = django_filters.BooleanFilter()

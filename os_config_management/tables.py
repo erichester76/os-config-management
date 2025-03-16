@@ -4,8 +4,6 @@ from django_tables2 import tables
 
 class ConfigItemTable(NetBoxTable):
     name = tables.Column(linkify=True)
-    type = tables.Column()
-    default_value = tables.Column()
 
     class Meta:
         model = ConfigItem
@@ -13,8 +11,6 @@ class ConfigItemTable(NetBoxTable):
 
 class ConfigurationTable(NetBoxTable):
     name = tables.Column(linkify=True)
-    status = tables.Column()
-    is_final = tables.Column()
 
     class Meta:
         model = Configuration
