@@ -1,6 +1,7 @@
 from .models import ConfigItem, Configuration, ConfigItemAssignment
 from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilterSetForm
 from django.forms import inlineformset_factory
+from django import forms
 
 ConfigItemAssignmentFormSet = inlineformset_factory(
     Configuration,
@@ -17,6 +18,8 @@ class ConfigItemImportForm(NetBoxModelImportForm):
         fields = ('name', 'type', 'default_value', 'description' )
         
 class ConfigItemForm(NetBoxModelForm):
+    default_value = forms.CharField(required=False)
+    
     class Meta:
         model = ConfigItem
         fields = ['name', 'type', 'default_value', 'description']
@@ -27,6 +30,8 @@ class ConfigItemFilterForm(NetBoxModelFilterSetForm):
         fields = ['name', 'type']
         
 class ConfigItemBulkEditForm(NetBoxModelForm):
+    default_value = forms.CharField(required=False)
+
     class Meta:
         model = ConfigItem
         fields = ['type', 'default_value', 'description']
