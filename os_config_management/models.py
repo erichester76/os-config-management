@@ -85,7 +85,7 @@ class Configuration(NetBoxModel):
 
     def clean(self):
         """Validate that values match associated config_items and their types."""
-        config_item_names = set(self.config_items.values_list('name', flat=True))
+        config_item_names = set(self.config_values.values_list('name', flat=True))
         for key in self.values.keys():
             if key not in config_item_names:
                 raise ValidationError(f"Key '{key}' in values is not in associated config_items.")
