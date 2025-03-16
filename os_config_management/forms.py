@@ -12,12 +12,22 @@ ConfigItemAssignmentFormSet = inlineformset_factory(
     can_order=True
 )
 
+
 class ConfigurationInclusionForm(forms.ModelForm):
     class Meta:
         model = ConfigurationInclusion
         fields = ['included_configuration', 'order']
         widgets = {'order': forms.HiddenInput()}
-        
+
+
+ConfigurationInclusionFormSet = inlineformset_factory(
+    Configuration,
+    ConfigurationInclusion,
+    form=ConfigurationInclusionForm,
+    extra=1,
+    can_delete=True,
+    can_order=True
+)        
 
 class ConfigItemImportForm(NetBoxModelImportForm):
     class Meta:
