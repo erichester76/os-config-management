@@ -7,7 +7,7 @@ class ConfigItemTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = ConfigItem
-        fields = ('name', 'type', 'default_value', 'description')
+        fields = ('pk', 'id', 'name', 'type', 'default_value', 'description')
         default_columns = ('name', 'type', 'default_value', 'description')
 
 class ConfigurationTable(NetBoxTable):
@@ -15,5 +15,5 @@ class ConfigurationTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = Configuration
-        fields = ('name', 'status', 'is_final', 'description')
+        fields = ('pk', 'id', 'name', 'status', 'is_final', 'description')
         default_columns = ('name', 'status', 'is_final', 'description')

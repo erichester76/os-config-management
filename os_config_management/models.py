@@ -12,6 +12,8 @@ class ConfigItem(NetBoxModel):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'Configuration Item'
+        verbose_name_plural = 'Configuration Items'
 
     def __str__(self):
         return self.name
@@ -61,6 +63,8 @@ class Configuration(NetBoxModel):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'Configuration'
+        verbose_name_plural = 'Configurations'
 
     def __str__(self):
         return self.name
