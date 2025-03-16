@@ -33,6 +33,7 @@ class ConfigItemBulkDeleteView(generic.BulkDeleteView):
     table = ConfigItemTable
 
 class ConfigItemImportView(generic.BulkImportView):
+    queryset = ConfigItem.objects.all()
     model = ConfigItem
     form = ConfigItemImportForm  
 
@@ -77,6 +78,7 @@ class ConfigurationBulkDeleteView(generic.BulkDeleteView):
     table = ConfigurationTable
 
 class ConfigurationImportView(generic.BulkImportView):
+    queryset = ConfigItem.objects.all()
     model = Configuration
     form = ConfigurationImportForm 
 

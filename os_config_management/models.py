@@ -79,6 +79,7 @@ class Configuration(NetBoxModel):
                 raise ValidationError(f"Value for '{key}' must be a list.")
             elif config_item.type == 'boolean' and not isinstance(value, bool):
                 raise ValidationError(f"Value for '{key}' must be a boolean.")
+            
     def get_absolute_url(self):
         return reverse('plugins:os_config_management:configuration', args=[self.pk])
     
