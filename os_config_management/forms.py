@@ -1,4 +1,4 @@
-from .models import ConfigItem, Configuration, ConfigItemAssignment
+from .models import ConfigItem, Configuration, ConfigItemAssignment, ConfigurationInclusion
 from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilterSetForm
 from django.forms import inlineformset_factory
 from django import forms
@@ -11,6 +11,13 @@ ConfigItemAssignmentFormSet = inlineformset_factory(
     can_delete=True,
     can_order=True
 )
+
+class ConfigurationInclusionForm(forms.ModelForm):
+    class Meta:
+        model = ConfigurationInclusion
+        fields = ['included_configuration', 'order']
+        widgets = {'order': forms.HiddenInput()}
+        
 
 class ConfigItemImportForm(NetBoxModelImportForm):
     class Meta:

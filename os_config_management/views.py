@@ -1,8 +1,8 @@
 from netbox.views import generic
-from .models import ConfigItem, Configuration
+from .models import ConfigItem, Configuration, ConfigurationInclusion
 from .tables import ConfigItemTable, ConfigurationTable
 from .filters import ConfigItemFilter, ConfigurationFilter
-from .forms import ConfigItemForm, ConfigurationForm, ConfigItemFilterForm, ConfigItemImportForm, ConfigurationFilterForm, ConfigurationImportForm, ConfigItemBulkEditForm, ConfigurationBulkEditForm, ConfigItemAssignmentFormSet
+from .forms import ConfigItemForm, ConfigurationForm, ConfigItemFilterForm, ConfigItemImportForm, ConfigurationFilterForm, ConfigurationImportForm, ConfigItemBulkEditForm, ConfigurationBulkEditForm, ConfigItemAssignmentFormSet, ConfigurationInclusionFormSet
 
 
 # ConfigItem Views
@@ -45,28 +45,50 @@ class ConfigurationListView(generic.ObjectListView):
     table = ConfigurationTable
     filterset = ConfigurationFilter
     filterset_form = ConfigurationFilterForm
-
+    
 class ConfigurationEditView(generic.ObjectEditView):
-    queryset = Configuration.objects.all()
-    form = ConfigurationForm
-    template_name = 'os_config_management/configuration_edit.html'
+    model = Configuration
+    form_class = ConfigurationForm
+    template_name = 'configuration_edit.html'
 
-    def get_extra_context(self, request, instance):
-        assignment_formset = ConfigItemAssignmentFormSet(instance=instance)
-        return {'assignment_formset': assignment_formset}
-
-    def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        form = self.get_form()
-        assignment_formset = ConfigItemAssignmentFormSet(request.POST, instance=obj)
-
-        if form.is_valid() and assignment_formset.is_valid():
-            obj = form.save()
-            assignment_formset.save()
-            return self.form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['linked_formset'] = ConfigurationInclusionFormSet(self.request.POST, instance=self.object)
+            context['item_formset'] = ConfigItemAssignmentFormSet(self.request.POST, instance=self.object)
         else:
-            context = self.get_context_data(form=form, assignment_formset=assignment_formset)
-            return render(request, self.template_name, context)
+            context['linked_formset'] = ConfigurationInclusionFormSet(instance=self.object)
+            context['item_formset'] = ConfigItemAssignmentFormSet(instance=self.object)
+        
+        # Compute inherited items (assuming a method exists or needs to be implemented)
+        inherited_config = self.object.get_inherited_config()  # Returns {name: value}
+        inherited_items = []
+        for name, value in inherited_config.items():
+            try:
+                config_item = ConfigItem.objects.get(name=name)
+                inherited_items.append({
+                    'id': config_item.id,
+                    'name': name,
+                    'value': value
+                })
+            except ConfigItem.DoesNotExist:
+                continue
+        context['inherited_items'] = inherited_items
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        linked_formset = context['linked_formset']
+        item_formset = context['item_formset']
+        if linked_formset.is_valid() and item_formset.is_valid():
+            self.object = form.save()
+            linked_formset.instance = self.object
+            linked_formset.save()
+            item_formset.instance = self.object
+            item_formset.save()
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
     
 class ConfigurationDeleteView(generic.ObjectDeleteView):
     queryset = Configuration.objects.all()
