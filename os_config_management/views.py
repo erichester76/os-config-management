@@ -47,6 +47,7 @@ class ConfigurationListView(generic.ObjectListView):
     filterset_form = ConfigurationFilterForm
     
 class ConfigurationEditView(generic.ObjectEditView):
+    queryset = Configuration.objects.all()
     model = Configuration
     form = ConfigurationForm
     template_name = 'os_config_management/configuration_edit.html'
