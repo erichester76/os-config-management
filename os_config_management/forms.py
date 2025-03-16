@@ -25,6 +25,8 @@ class ConfigItemForm(NetBoxModelForm):
         fields = ['name', 'type', 'default_value', 'description']
 
 class ConfigItemFilterForm(NetBoxModelFilterSetForm):
+    model = ConfigItem
+
     class Meta:
         model = ConfigItem
         fields = ['name', 'type']
@@ -47,6 +49,8 @@ class ConfigurationImportForm(NetBoxModelImportForm):
         fields = ['name', 'included_configurations', 'config_values', 'is_final', 'status', 'description']
         
 class ConfigurationFilterForm(NetBoxModelFilterSetForm):
+    model = Configuration
+
     class Meta:
         model = Configuration
         fields = ['name', 'status', 'is_final']
