@@ -34,12 +34,12 @@ class ConfigItemBulkEditForm(NetBoxModelForm):
 class ConfigurationForm(NetBoxModelForm):
     class Meta:
         model = Configuration
-        fields = ['name', 'included_configurations', 'config_items', 'is_final', 'status', 'description']
+        fields = ['name', 'included_configurations', 'config_values', 'is_final', 'status', 'description']
         
 class ConfigurationImportForm(NetBoxModelImportForm):
     class Meta:
         model = Configuration
-        fields = ['name', 'included_configurations', 'config_items', 'is_final', 'status', 'description']
+        fields = ['name', 'included_configurations', 'config_values', 'is_final', 'status', 'description']
         
 class ConfigurationFilterForm(NetBoxModelFilterSetForm):
     class Meta:

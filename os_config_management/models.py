@@ -64,7 +64,7 @@ class ConfigurationInclusion(NetBoxModel):
 class Configuration(NetBoxModel):
     name = models.CharField(max_length=100, unique=True)
     included_configurations = models.ManyToManyField('self', through='ConfigurationInclusion', symmetrical=False, blank=True)
-    config_items = models.ManyToManyField(
+    config_values = models.ManyToManyField(
         'ConfigItem',
         through='ConfigItemAssignment',
         related_name='configurations',
