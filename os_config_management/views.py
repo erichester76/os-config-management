@@ -1,9 +1,9 @@
 from netbox.views import generic
-from .models import ConfigItem, Configuration, ConfigurationInclusion
+from .models import ConfigItem, Configuration
 from .tables import ConfigItemTable, ConfigurationTable
 from .filters import ConfigItemFilter, ConfigurationFilter
 from .forms import ConfigItemForm, ConfigurationForm, ConfigItemFilterForm, ConfigItemImportForm, ConfigurationFilterForm, ConfigurationImportForm, ConfigItemBulkEditForm, ConfigurationBulkEditForm, ConfigItemAssignmentFormSet, ConfigurationInclusionFormSet
-
+from django.urls import reverse
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
@@ -48,8 +48,8 @@ class ConfigurationListView(generic.ObjectListView):
     
 class ConfigurationEditView(generic.ObjectEditView):
     model = Configuration
-    form_class = ConfigurationForm
-    template_name = 'configuration_edit.html'
+    form = ConfigurationForm
+    template_name = 'os_config_management/configuration_edit.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -60,7 +60,7 @@ class ConfigurationEditView(generic.ObjectEditView):
             context['linked_formset'] = ConfigurationInclusionFormSet(instance=self.object)
             context['item_formset'] = ConfigItemAssignmentFormSet(instance=self.object)
         
-        # Compute inherited items (assuming a method exists or needs to be implemented)
+        # Compute inherited items (assumes a method exists in the model)
         inherited_config = self.object.get_inherited_config()  # Returns {name: value}
         inherited_items = []
         for name, value in inherited_config.items():
@@ -89,6 +89,9 @@ class ConfigurationEditView(generic.ObjectEditView):
             return super().form_valid(form)
         else:
             return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse('plugins:os_configuration_management:configuration_detail', kwargs={'pk': self.object.pk})
     
 class ConfigurationDeleteView(generic.ObjectDeleteView):
     queryset = Configuration.objects.all()

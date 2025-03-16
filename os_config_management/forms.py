@@ -23,6 +23,7 @@ class ConfigurationInclusionForm(forms.ModelForm):
 ConfigurationInclusionFormSet = inlineformset_factory(
     Configuration,
     ConfigurationInclusion,
+    fk_name='parent_configuration', 
     form=ConfigurationInclusionForm,
     extra=1,
     can_delete=True,

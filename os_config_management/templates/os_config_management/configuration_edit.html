@@ -1,154 +1,171 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% extends 'base.html' %}
+{% load static %}
 
-    <!-- Included Configurations Section -->
-    <div id="linked-configurations">
-        <h3>Included Configurations</h3>
-        {{ linked_formset.management_form }}
-        {% for form in linked_formset %}
-            <div class="form-row">
-                <span class="drag-handle">☰</span>
-                {{ form.id }}
-                {{ form.included_configuration }}
-                {{ form.order }}
-                <button type="button" class="delete-row">Delete</button>
-            </div>
-        {% endfor %}
-        <button type="button" id="add-linked">Add Included Configuration</button>
+{% block content %}
+<form method="post" class="form">
+  {% csrf_token %}
+
+  <!-- General Configuration Fields -->
+  <div class="card mb-3">
+    <div class="card-header"><h3>Configuration Details</h3></div>
+    <div class="card-body">
+      {{ form.as_p }}
     </div>
+  </div>
 
-    <!-- Inherited Configuration Items -->
-    <div>
-        <h3>Inherited Configuration Items</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in inherited_items %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.value }}</td>
-                        <td>
-                            <button type="button" class="override-item" 
-                                    data-id="{{ item.id }}" 
-                                    data-name="{{ item.name }}" 
-                                    data-value="{{ item.value }}">Override</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  <!-- Included Configurations Section -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h3>Included Configurations</h3>
+      <button type="button" class="btn btn-primary btn-sm float-end" id="add-linked">Add</button>
     </div>
-
-    <!-- Direct Configuration Items -->
-    <div id="config-items">
-        <h3>Direct Configuration Items</h3>
-        {{ item_formset.management_form }}
-        {% for form in item_formset %}
-            <div class="form-row">
-                {{ form.id }}
-                {{ form.config_item }}
-                {{ form.value }}
-                {{ form.not_overridable }}
-                <button type="button" class="delete-row">Delete</button>
-            </div>
-        {% endfor %}
-        <button type="button" id="add-item">Add Configuration Item</button>
+    <div class="card-body" id="linked-configurations">
+      {{ linked_formset.management_form }}
+      {% for form in linked_formset %}
+        <div class="form-row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
+          <span class="drag-handle me-2">☰</span>
+          {{ form.id }}
+          {{ form.included_configuration }}
+          {{ form.ORDER }} <!-- Hidden field for ordering -->
+          {{ form.DELETE }}
+          <button type="button" class="btn btn-danger btn-sm float-end delete-row">Delete</button>
+        </div>
+      {% endfor %}
     </div>
+  </div>
 
-    <button type="submit">Save</button>
+  <!-- Inherited Configuration Items -->
+  <div class="card mb-3">
+    <div class="card-header"><h3>Inherited Configuration Items</h3></div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Item Value</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inherited_items %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.value }}</td>
+            <td>
+              <button type="button" class="btn btn-warning btn-sm override-item" 
+                      data-id="{{ item.id }}" data-name="{{ item.name }}" data-value="{{ item.value }}">Override</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3">No inherited items.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Direct Configuration Items -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h3>Configuration Items</h3>
+      <button type="button" class="btn btn-primary btn-sm float-end" id="add-item">Add</button>
+    </div>
+    <div class="card-body" id="configuration-items">
+      {{ item_formset.management_form }}
+      {% for form in item_formset %}
+        <div class="form-row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
+          {{ form.id }}
+          {{ form.config_item }}
+          {{ form.value }}
+          {{ form.not_overridable }}
+          {{ form.DELETE }}
+          <button type="button" class="btn btn-danger btn-sm float-end delete-row">Delete</button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-success">Save</button>
 </form>
+{% endblock %}
 
+{% block javascript %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Add Included Configuration
-    $("#add-linked").click(function() {
-        var totalForms = parseInt($("#id_inclusions-TOTAL_FORMS").val());
-        var newForm = $("#linked-configurations .form-row:first").clone(true);
-        newForm.find(":input").each(function() {
-            var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
-            var id = "id_" + name;
-            $(this).attr({"name": name, "id": id}).val("");
-            if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
-        });
-        newForm.appendTo("#linked-configurations");
-        $("#id_inclusions-TOTAL_FORMS").val(totalForms + 1);
-    });
+  // Drag-and-drop for Included Configurations
+  $("#linked-configurations").sortable({
+    items: ".form-row",
+    handle: ".drag-handle",
+    update: function(event, ui) {
+      $("#linked-configurations .form-row").each(function(index) {
+        $(this).find('input[name$="-ORDER"]').val(index + 1);
+      });
+    }
+  });
 
-    // Delete Included Configuration
-    $("#linked-configurations").on("click", ".delete-row", function() {
-        $(this).closest(".form-row").remove();
+  // Add Included Configuration
+  $("#add-linked").click(function() {
+    var totalForms = parseInt($("#id_inclusions-TOTAL_FORMS").val());
+    var newForm = $("#linked-configurations .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id}).val("");
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
+      if ($(this).attr("name").endsWith("-ORDER")) $(this).val(totalForms + 1);
     });
+    newForm.appendTo("#linked-configurations");
+    $("#id_inclusions-TOTAL_FORMS").val(totalForms + 1);
+  });
 
-    // Add Configuration Item
-    $("#add-item").click(function() {
-        var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
-        var newForm = $("#config-items .form-row:first").clone(true);
-        newForm.find(":input").each(function() {
-            var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
-            var id = "id_" + name;
-            $(this).attr({"name": name, "id": id}).val("");
-            if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
-        });
-        newForm.appendTo("#config-items");
-        $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
-    });
+  // Delete Included Configuration
+  $("#linked-configurations").on("click", ".delete-row", function() {
+    $(this).closest(".form-row").remove();
+  });
 
-    // Override Inherited Item
-    $(".override-item").click(function() {
-        var configItemId = $(this).data("id");
-        var value = $(this).data("value");
-        var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
-        var newForm = $("#config-items .form-row:first").clone(true);
-        newForm.find(":input").each(function() {
-            var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
-            var id = "id_" + name;
-            $(this).attr({"name": name, "id": id});
-            if ($(this).attr("name").endsWith("-config_item")) {
-                $(this).val(configItemId);
-            } else if ($(this).attr("name").endsWith("-value")) {
-                $(this).val(value);
-            } else {
-                $(this).val("");
-            }
-            if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
-        });
-        newForm.appendTo("#config-items");
-        $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
+  // Add Configuration Item
+  $("#add-item").click(function() {
+    var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
+    var newForm = $("#configuration-items .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id}).val("");
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
     });
+    newForm.appendTo("#configuration-items");
+    $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
+  });
 
-    // Delete Configuration Item
-    $("#config-items").on("click", ".delete-row", function() {
-        $(this).closest(".form-row").remove();
+  // Override Inherited Item
+  $(".override-item").click(function() {
+    var configItemId = $(this).data("id");
+    var value = $(this).data("value");
+    var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
+    var newForm = $("#configuration-items .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id});
+      if ($(this).attr("name").endsWith("-config_item")) {
+        $(this).val(configItemId);
+      } else if ($(this).attr("name").endsWith("-value")) {
+        $(this).val(value);
+      } else {
+        $(this).val("");
+      }
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
     });
+    newForm.appendTo("#configuration-items");
+    $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
+  });
 
-    // Drag-and-drop for ordering included configurations
-    $("#linked-configurations").sortable({
-        items: ".form-row",
-        handle: ".drag-handle",
-        update: function(event, ui) {
-            $("#linked-configurations .form-row").each(function(index) {
-                $(this).find('input[name$="-order"]').val(index);
-            });
-        }
-    });
+  // Delete Configuration Item
+  $("#configuration-items").on("click", ".delete-row", function() {
+    $(this).closest(".form-row").remove();
+  });
 });
 </script>
-
-<style>
-    .drag-handle {
-        cursor: move;
-        margin-right: 10px;
-    }
-    .form-row {
-        margin-bottom: 10px;
-    }
-</style>
+{% endblock %}
