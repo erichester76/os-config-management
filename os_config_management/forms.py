@@ -1,6 +1,16 @@
-from .models import ConfigItem, Configuration
+from .models import ConfigItem, Configuration, ConfigItemAssignment
 from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilterSetForm
-        
+from django.forms import inlineformset_factory
+
+ConfigItemAssignmentFormSet = inlineformset_factory(
+    Configuration,
+    ConfigItemAssignment,
+    fields=('config_item', 'value', 'not_overridable'),
+    extra=1,
+    can_delete=True,
+    can_order=True
+)
+
 class ConfigItemImportForm(NetBoxModelImportForm):
     class Meta:
         model = ConfigItem

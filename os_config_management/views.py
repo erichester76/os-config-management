@@ -2,13 +2,15 @@ from netbox.views import generic
 from .models import ConfigItem, Configuration
 from .tables import ConfigItemTable, ConfigurationTable
 from .filters import ConfigItemFilter, ConfigurationFilter
-from .forms import ConfigItemForm, ConfigurationForm, ConfigItemImportForm, ConfigurationImportForm, ConfigItemBulkEditForm, ConfigurationBulkEditForm
+from .forms import ConfigItemForm, ConfigurationForm, ConfigItemFilterForm, ConfigItemImportForm, ConfigurationFilterForm, ConfigurationImportForm, ConfigItemBulkEditForm, ConfigurationBulkEditForm, ConfigItemAssignmentFormSet
+
 
 # ConfigItem Views
 class ConfigItemListView(generic.ObjectListView):
     queryset = ConfigItem.objects.all()
     table = ConfigItemTable
     filterset = ConfigItemFilter
+    filterset_form = ConfigItemFilterForm
 
 class ConfigItemEditView(generic.ObjectEditView):
     queryset = ConfigItem.objects.all()
@@ -35,17 +37,35 @@ class ConfigItemBulkDeleteView(generic.BulkDeleteView):
 class ConfigItemImportView(generic.BulkImportView):
     queryset = ConfigItem.objects.all()
     model = ConfigItem
-    form = ConfigItemImportForm  
+    model_form = ConfigItemImportForm  
 
 # Configuration Views
 class ConfigurationListView(generic.ObjectListView):
     queryset = Configuration.objects.all()
     table = ConfigurationTable
     filterset = ConfigurationFilter
+    filterset_form = ConfigurationFilterForm
 
 class ConfigurationEditView(generic.ObjectEditView):
     queryset = Configuration.objects.all()
-    form = ConfigurationForm
+    model_form = ConfigurationForm
+
+    def get_extra_context(self, request, instance):
+        assignment_formset = ConfigItemAssignmentFormSet(instance=instance)
+        return {'assignment_formset': assignment_formset}
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        form = self.get_form()
+        assignment_formset = ConfigItemAssignmentFormSet(request.POST, instance=obj)
+
+        if form.is_valid() and assignment_formset.is_valid():
+            obj = form.save()
+            assignment_formset.save()
+            return self.form_valid(form)
+        else:
+            context = self.get_context_data(form=form, assignment_formset=assignment_formset)
+            return render(request, self.template_name, context)
     
 class ConfigurationDeleteView(generic.ObjectDeleteView):
     queryset = Configuration.objects.all()
@@ -80,5 +100,5 @@ class ConfigurationBulkDeleteView(generic.BulkDeleteView):
 class ConfigurationImportView(generic.BulkImportView):
     queryset = ConfigItem.objects.all()
     model = Configuration
-    form = ConfigurationImportForm 
+    model_form = ConfigurationImportForm 
 

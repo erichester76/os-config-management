@@ -1,0 +1,27 @@
+<!-- templates/os_config_management/configuration_edit.html -->
+{% extends 'generic/object_edit.html' %}
+{% load static %}
+{% load form_helpers %}
+
+{% block form %}
+  <div class="card">
+    <div class="card-header">
+      <h3>Configuration Details</h3>
+    </div>
+    <div class="card-body">
+      {{ form.as_p }}
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-header">
+      <h3>Config Items</h3>
+    </div>
+    <div class="card-body">
+      {{ assignment_formset.management_form }}
+      {% for form in assignment_formset %}
+        {{ form.as_p }}
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

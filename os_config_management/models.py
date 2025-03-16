@@ -31,7 +31,17 @@ class ConfigItem(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:os_config_management:configitem', args=[self.pk])
 
-class ConfigurationInclusion(models.Model):
+
+class ConfigItemAssignment(NetBoxModel):
+    configuration = models.ForeignKey('Configuration', on_delete=models.CASCADE)
+    config_item = models.ForeignKey('ConfigItem', on_delete=models.CASCADE)
+    value = models.JSONField(blank=True, null=True)
+    not_overridable = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('configuration', 'config_item')
+        
+class ConfigurationInclusion(NetBoxModel):
     parent_configuration = models.ForeignKey('Configuration', on_delete=models.CASCADE, related_name='inclusions')
     included_configuration = models.ForeignKey('Configuration', on_delete=models.CASCADE)
     order = models.IntegerField()
@@ -54,9 +64,13 @@ class ConfigurationInclusion(models.Model):
 class Configuration(NetBoxModel):
     name = models.CharField(max_length=100, unique=True)
     included_configurations = models.ManyToManyField('self', through='ConfigurationInclusion', symmetrical=False, blank=True)
-    config_items = models.ManyToManyField(ConfigItem, blank=True)
-    values = models.JSONField(default=dict, blank=True)
-    not_overridable = models.BooleanField(default=False)
+    config_items = models.ManyToManyField(
+        'ConfigItem',
+        through='ConfigItemAssignment',
+        related_name='configurations',
+        blank=True,
+        help_text="Config items directly assigned to this configuration."
+    )
     is_final = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=[('active', 'Active'), ('inactive', 'Inactive')])
     description = models.TextField(blank=True)
@@ -88,24 +102,27 @@ class Configuration(NetBoxModel):
         return reverse('plugins:os_config_management:configuration', args=[self.pk])
     
     @cached_property
-    def inherited_config(self):
-        """Compute the inherited configuration with caching."""
+    def get_inherited_config(self):
         config = {}
         # Start with default values from ConfigItems
         for config_item in ConfigItem.objects.all():
             if config_item.default_value is not None:
-                config[config_item.name] = config_item.default_value
-        # Apply included configurations in order
-        inclusions = self.inclusions.all().order_by('order')
+                config[config_item.name] = {'value': config_item.default_value, 'not_overridable': False}
+
+        # Process included configurations in order
+        inclusions = self.inclusions_as_parent.all().order_by('order')
         for inclusion in inclusions:
-            included_config = inclusion.included_configuration.inherited_config
-            if inclusion.included_configuration.not_overridable:
-                config.update({k: v for k, v in included_config.items() if k not in config})
-            else:
-                config.update(included_config)
-        # Apply this configuration's values
-        if self.not_overridable:
-            config.update({k: v for k, v in self.values.items() if k not in config})
-        else:
-            config.update(self.values)
-        return config
+            included_config = inclusion.included_configuration
+            inherited = included_config.get_inherited_config()
+            for key, value in inherited.items():
+                if key not in config or not config[key]['not_overridable']:
+                    config[key] = {'value': value, 'not_overridable': False}
+
+        # Apply this configuration's assignments
+        assignments = ConfigItemAssignment.objects.filter(configuration=self)
+        for assignment in assignments:
+            key = assignment.config_item.name
+            config[key] = {'value': assignment.value, 'not_overridable': assignment.not_overridable}
+
+        # Return only the values
+        return {k: v['value'] for k, v in config.items()}
