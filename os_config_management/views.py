@@ -12,7 +12,7 @@ class ConfigItemListView(generic.ObjectListView):
 
 class ConfigItemEditView(generic.ObjectEditView):
     queryset = ConfigItem.objects.all()
-    model_form = ConfigItemForm
+    form = ConfigItemForm
 
 class ConfigItemDeleteView(generic.ObjectDeleteView):
     queryset = ConfigItem.objects.all()
@@ -45,7 +45,7 @@ class ConfigurationListView(generic.ObjectListView):
 
 class ConfigurationEditView(generic.ObjectEditView):
     queryset = Configuration.objects.all()
-    model_form = ConfigurationForm
+    form = ConfigurationForm
     
 class ConfigurationDeleteView(generic.ObjectDeleteView):
     queryset = Configuration.objects.all()
