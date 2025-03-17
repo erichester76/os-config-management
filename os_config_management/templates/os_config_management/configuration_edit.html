@@ -5,9 +5,6 @@
 <form method="post" class="form">
   <!-- General Configuration Fields -->
   <div class="card mb-3">
-    <div class="card-header">
-      <h3>General Configuration</h3>
-    </div>
     <div class="card-body">
       {% csrf_token %}
       <div class="form-group">
@@ -23,8 +20,8 @@
       <button type="button" class="btn btn-primary btn-sm float-end" id="add-linked">Add</button>
     </div>
     <div class="card-body" id="linked-configurations">
-      {{ linked_formset.management_form }}
-      {% for form in linked_formset %}
+      {{ included_formset.management_form }}
+      {% for form in included_formset %}
         <div class="row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
           <div class="col-auto">
             <span class="drag-handle me-2">☰</span>
@@ -93,7 +90,6 @@
         <div class="row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
           <div class="col">
             <div class="form-group">
-              {{ form.id }}
               {{ form.config_item }}
             </div>
           </div>

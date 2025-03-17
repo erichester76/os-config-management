@@ -51,20 +51,16 @@ class ConfigurationEditView(generic.ObjectEditView):
     form = ConfigurationForm
     template_name = 'os_config_management/configuration_edit.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        instance = self.object if self.object else None
-        if self.request.POST:
-            context['linked_formset'] = ConfigurationInclusionFormSet(self.request.POST, instance=instance)
-            context['item_formset'] = ConfigItemAssignmentFormSet(self.request.POST, instance=instance)
-        else:
-            context['linked_formset'] = ConfigurationInclusionFormSet(instance=instance)
-            context['item_formset'] = ConfigItemAssignmentFormSet(instance=instance)
-
-        # Compute inherited items only if self.object exists
+    def get_extra_context(self, request, instance):
+        included_formset = ConfigurationInclusionFormSet(
+            data=self.request.POST if request.method == "POST" else None, 
+            instance=instance)
+        item_formset = ConfigItemAssignmentFormSet(
+            data=self.request.POST if request.method == "POST" else None, 
+            instance=instance)
         inherited_items = []
-        if self.object:
-            inherited_config = self.object.get_inherited_config()  # Returns {name: value}
+        if instance.pk:
+            inherited_config = instance.get_inherited_config()  
             for name, value in inherited_config.items():
                 try:
                     config_item = ConfigItem.objects.get(name=name)
@@ -75,22 +71,11 @@ class ConfigurationEditView(generic.ObjectEditView):
                     })
                 except ConfigItem.DoesNotExist:
                     continue
-        context['inherited_items'] = inherited_items
-        return context
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        linked_formset = context['linked_formset']
-        item_formset = context['item_formset']
-        if linked_formset.is_valid() and item_formset.is_valid():
-            self.object = form.save()
-            linked_formset.instance = self.object
-            linked_formset.save()
-            item_formset.instance = self.object
-            item_formset.save()
-            return super().form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return {
+            'included_formset': included_formset,
+            'item_formset': item_formset,
+            'inherited_items': inherited_items
+        }
 
     def get_success_url(self):
         return reverse('plugins:os_configuration_management:configuration', kwargs={'pk': self.object.pk})

@@ -3,15 +3,6 @@ from netbox.forms import NetBoxModelForm, NetBoxModelImportForm, NetBoxModelFilt
 from django.forms import inlineformset_factory
 from django import forms
 
-ConfigItemAssignmentFormSet = inlineformset_factory(
-    Configuration,
-    ConfigItemAssignment,
-    fields=('config_item', 'value', 'not_overridable'),
-    extra=1,
-    can_delete=True,
-    can_order=True
-)
-
 class ConfigurationInclusionForm(forms.ModelForm):
     class Meta:
         model = ConfigurationInclusion
@@ -27,6 +18,15 @@ ConfigurationInclusionFormSet = inlineformset_factory(
     can_delete=True,
     can_order=True
 )        
+
+ConfigItemAssignmentFormSet = inlineformset_factory(
+    Configuration,
+    ConfigItemAssignment,
+    fields=('config_item', 'value', 'not_overridable'),
+    extra=1,
+    can_delete=True,
+    can_order=True
+)
 
 class ConfigItemImportForm(NetBoxModelImportForm):
     class Meta:
