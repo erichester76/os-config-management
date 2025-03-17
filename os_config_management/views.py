@@ -61,19 +61,20 @@ class ConfigurationEditView(generic.ObjectEditView):
             context['linked_formset'] = ConfigurationInclusionFormSet(instance=instance)
             context['item_formset'] = ConfigItemAssignmentFormSet(instance=instance)
 
-        # Compute inherited items (assumes a method exists in the model)
-        inherited_config = self.object.get_inherited_config()  # Returns {name: value}
+        # Compute inherited items only if self.object exists
         inherited_items = []
-        for name, value in inherited_config.items():
-            try:
-                config_item = ConfigItem.objects.get(name=name)
-                inherited_items.append({
-                    'id': config_item.id,
-                    'name': name,
-                    'value': value
-                })
-            except ConfigItem.DoesNotExist:
-                continue
+        if self.object:
+            inherited_config = self.object.get_inherited_config()  # Returns {name: value}
+            for name, value in inherited_config.items():
+                try:
+                    config_item = ConfigItem.objects.get(name=name)
+                    inherited_items.append({
+                        'id': config_item.id,
+                        'name': name,
+                        'value': value
+                    })
+                except ConfigItem.DoesNotExist:
+                    continue
         context['inherited_items'] = inherited_items
         return context
 
