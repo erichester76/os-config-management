@@ -5,9 +5,14 @@
 <form method="post" class="form">
   <!-- General Configuration Fields -->
   <div class="card mb-3">
+    <div class="card-header">
+      <h3>General Configuration</h3>
+    </div>
     <div class="card-body">
       {% csrf_token %}
-      {{ form.as_p }}
+      <div class="form-group">
+        {{ form.as_p }}
+      </div>
     </div>
   </div>
 
@@ -20,13 +25,25 @@
     <div class="card-body" id="linked-configurations">
       {{ linked_formset.management_form }}
       {% for form in linked_formset %}
-        <div class="form-row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
-          <span class="drag-handle me-2">☰</span>
-          {{ form.id }}
-          {{ form.included_configuration }}
-          {{ form.ORDER }} <!-- Hidden field for ordering -->
-          {{ form.DELETE }}
-          <button type="button" class="btn btn-danger btn-sm float-end delete-row">Delete</button>
+        <div class="row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
+          <div class="col-auto">
+            <span class="drag-handle me-2">☰</span>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.id }}
+              {{ form.included_configuration }}
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-group">
+              {{ form.ORDER }}
+              {{ form.DELETE }}
+            </div>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
+          </div>
         </div>
       {% endfor %}
     </div>
@@ -36,29 +53,31 @@
   <div class="card mb-3">
     <div class="card-header"><h3>Inherited Configuration Items</h3></div>
     <div class="card-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Item Name</th>
-            <th>Item Value</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in inherited_items %}
-          <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.value }}</td>
-            <td>
-              <button type="button" class="btn btn-warning btn-sm override-item" 
-                      data-id="{{ item.id }}" data-name="{{ item.name }}" data-value="{{ item.value }}">Override</button>
-            </td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3">No inherited items.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Item Value</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in inherited_items %}
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.value }}</td>
+              <td>
+                <button type="button" class="btn btn-warning btn-sm override-item" 
+                        data-id="{{ item.id }}" data-name="{{ item.name }}" data-value="{{ item.value }}">Override</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No inherited items.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -71,13 +90,31 @@
     <div class="card-body" id="configuration-items">
       {{ item_formset.management_form }}
       {% for form in item_formset %}
-        <div class="form-row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
-          {{ form.id }}
-          {{ form.config_item }}
-          {{ form.value }}
-          {{ form.not_overridable }}
-          {{ form.DELETE }}
-          <button type="button" class="btn btn-danger btn-sm float-end delete-row">Delete</button>
+        <div class="row mb-2 p-2 border rounded" data-form-id="{{ form.prefix }}">
+          <div class="col">
+            <div class="form-group">
+              {{ form.id }}
+              {{ form.config_item }}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.value }}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.not_overridable }}
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-group">
+              {{ form.DELETE }}
+            </div>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
+          </div>
         </div>
       {% endfor %}
     </div>
@@ -90,23 +127,31 @@
 {% block javascript %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<style>
+  .drag-handle {
+    cursor: move;
+  }
+</style>
 <script>
 $(document).ready(function() {
-  // Drag-and-drop for Included Configurations
   $("#linked-configurations").sortable({
-    items: ".form-row",
+    items: ".row",
     handle: ".drag-handle",
     update: function(event, ui) {
-      $("#linked-configurations .form-row").each(function(index) {
+      $("#linked-configurations .row").each(function(index) {
         $(this).find('input[name$="-ORDER"]').val(index + 1);
       });
     }
   });
 
-  // Add Included Configuration
   $("#add-linked").click(function() {
+    console.log("Add linked clicked");
     var totalForms = parseInt($("#id_inclusions-TOTAL_FORMS").val());
-    var newForm = $("#linked-configurations .form-row:first").clone(true);
+    var newForm = $("#linked-configurations .row:first").clone(true);
+    if (newForm.length === 0) {
+      alert("No initial form to clone. Ensure formset has at least one form.");
+      return;
+    }
     newForm.find(":input").each(function() {
       var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
       var id = "id_" + name;
@@ -118,15 +163,18 @@ $(document).ready(function() {
     $("#id_inclusions-TOTAL_FORMS").val(totalForms + 1);
   });
 
-  // Delete Included Configuration
   $("#linked-configurations").on("click", ".delete-row", function() {
-    $(this).closest(".form-row").remove();
+    $(this).closest(".row").remove();
   });
 
-  // Add Configuration Item
   $("#add-item").click(function() {
+    console.log("Add item clicked");
     var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
-    var newForm = $("#configuration-items .form-row:first").clone(true);
+    var newForm = $("#configuration-items .row:first").clone(true);
+    if (newForm.length === 0) {
+      alert("No initial form to clone. Ensure formset has at least one form.");
+      return;
+    }
     newForm.find(":input").each(function() {
       var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
       var id = "id_" + name;
@@ -137,12 +185,11 @@ $(document).ready(function() {
     $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
   });
 
-  // Override Inherited Item
   $(".override-item").click(function() {
     var configItemId = $(this).data("id");
     var value = $(this).data("value");
     var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
-    var newForm = $("#configuration-items .form-row:first").clone(true);
+    var newForm = $("#configuration-items .row:first").clone(true);
     newForm.find(":input").each(function() {
       var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
       var id = "id_" + name;
@@ -160,9 +207,8 @@ $(document).ready(function() {
     $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
   });
 
-  // Delete Configuration Item
   $("#configuration-items").on("click", ".delete-row", function() {
-    $(this).closest(".form-row").remove();
+    $(this).closest(".row").remove();
   });
 });
 </script>
