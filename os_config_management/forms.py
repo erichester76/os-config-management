@@ -12,7 +12,6 @@ ConfigItemAssignmentFormSet = inlineformset_factory(
     can_order=True
 )
 
-
 class ConfigurationInclusionForm(forms.ModelForm):
     class Meta:
         model = ConfigurationInclusion

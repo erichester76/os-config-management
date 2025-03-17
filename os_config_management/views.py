@@ -53,13 +53,14 @@ class ConfigurationEditView(generic.ObjectEditView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        instance = self.object if self.object else None
         if self.request.POST:
-            context['linked_formset'] = ConfigurationInclusionFormSet(self.request.POST, instance=self.object)
-            context['item_formset'] = ConfigItemAssignmentFormSet(self.request.POST, instance=self.object)
+            context['linked_formset'] = ConfigurationInclusionFormSet(self.request.POST, instance=instance)
+            context['item_formset'] = ConfigItemAssignmentFormSet(self.request.POST, instance=instance)
         else:
-            context['linked_formset'] = ConfigurationInclusionFormSet(instance=self.object)
-            context['item_formset'] = ConfigItemAssignmentFormSet(instance=self.object)
-        
+            context['linked_formset'] = ConfigurationInclusionFormSet(instance=instance)
+            context['item_formset'] = ConfigItemAssignmentFormSet(instance=instance)
+
         # Compute inherited items (assumes a method exists in the model)
         inherited_config = self.object.get_inherited_config()  # Returns {name: value}
         inherited_items = []

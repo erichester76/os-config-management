@@ -1,17 +1,10 @@
-{% extends "generic/object_edit.html" %}
+{% extends 'generic/object.html' %}
 {% load static %}
 
 {% block content %}
 <form method="post" class="form">
   <!-- General Configuration Fields -->
   <div class="card mb-3">
-    <div class="card-header">
-    <h3>{% if object and object.pk %}
-        <p>Editing <a href="{{ object.get_absolute_url }}">{{ object }}</a></p>
-    {% else %}
-        <p>Adding a new Configuration</p>
-    {% endif %}</h3>
-   </div>
     <div class="card-body">
       {% csrf_token %}
       {{ form.as_p }}
