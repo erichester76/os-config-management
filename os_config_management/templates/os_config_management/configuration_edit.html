@@ -35,7 +35,6 @@
           <div class="col-auto">
             <div class="form-group">
               {{ form.ORDER }}
-              {{ form.DELETE }}
             </div>
           </div>
           <div class="col-auto">
@@ -104,9 +103,6 @@
             </div>
           </div>
           <div class="col-auto">
-            <div class="form-group">
-              {{ form.DELETE }}
-            </div>
           </div>
           <div class="col-auto">
             <button type="button" class="btn btn-danger btn-sm delete-row">Delete</button>
@@ -118,4 +114,85 @@
 
   <button type="submit" class="btn btn-success">Save</button>
 </form>
+{% endblock %}
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Drag-and-drop for Included Configurations
+  $("#linked-configurations").sortable({
+    items: ".form-row",
+    handle: ".drag-handle",
+    update: function(event, ui) {
+      $("#linked-configurations .form-row").each(function(index) {
+        $(this).find('input[name$="-ORDER"]').val(index + 1);
+      });
+    }
+  });
+
+  // Add Included Configuration
+  $("#add-linked").click(function() {
+    var totalForms = parseInt($("#id_inclusions-TOTAL_FORMS").val());
+    var newForm = $("#linked-configurations .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id}).val("");
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
+      if ($(this).attr("name").endsWith("-ORDER")) $(this).val(totalForms + 1);
+    });
+    newForm.appendTo("#linked-configurations");
+    $("#id_inclusions-TOTAL_FORMS").val(totalForms + 1);
+  });
+
+  // Delete Included Configuration
+  $("#linked-configurations").on("click", ".delete-row", function() {
+    $(this).closest(".form-row").remove();
+  });
+
+  // Add Configuration Item
+  $("#add-item").click(function() {
+    var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
+    var newForm = $("#configuration-items .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id}).val("");
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
+    });
+    newForm.appendTo("#configuration-items");
+    $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
+  });
+
+  // Override Inherited Item
+  $(".override-item").click(function() {
+    var configItemId = $(this).data("id");
+    var value = $(this).data("value");
+    var totalForms = parseInt($("#id_configitemassignment-TOTAL_FORMS").val());
+    var newForm = $("#configuration-items .form-row:first").clone(true);
+    newForm.find(":input").each(function() {
+      var name = $(this).attr("name").replace("-0-", "-" + totalForms + "-");
+      var id = "id_" + name;
+      $(this).attr({"name": name, "id": id});
+      if ($(this).attr("name").endsWith("-config_item")) {
+        $(this).val(configItemId);
+      } else if ($(this).attr("name").endsWith("-value")) {
+        $(this).val(value);
+      } else {
+        $(this).val("");
+      }
+      if ($(this).attr("name").endsWith("-DELETE")) $(this).prop("checked", false);
+    });
+    newForm.appendTo("#configuration-items");
+    $("#id_configitemassignment-TOTAL_FORMS").val(totalForms + 1);
+  });
+
+  // Delete Configuration Item
+  $("#configuration-items").on("click", ".delete-row", function() {
+    $(this).closest(".form-row").remove();
+  });
+});
+</script>
 {% endblock %}

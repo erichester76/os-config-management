@@ -52,13 +52,19 @@ class ConfigurationEditView(generic.ObjectEditView):
     template_name = 'os_config_management/configuration_edit.html'
 
     def get_extra_context(self, request, instance):
+        
         included_formset = ConfigurationInclusionFormSet(
             data=self.request.POST if request.method == "POST" else None, 
-            instance=instance)
+            instance=instance
+        )
+        
         item_formset = ConfigItemAssignmentFormSet(
             data=self.request.POST if request.method == "POST" else None, 
-            instance=instance)
+            instance=instance
+        )
+        
         inherited_items = []
+        
         if instance.pk:
             inherited_config = instance.get_inherited_config()  
             for name, value in inherited_config.items():
@@ -71,6 +77,7 @@ class ConfigurationEditView(generic.ObjectEditView):
                     })
                 except ConfigItem.DoesNotExist:
                     continue
+        
         return {
             'included_formset': included_formset,
             'item_formset': item_formset,
